@@ -1,7 +1,8 @@
+import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:indoor_localization_web/widgets/widget_controllers/map_object_widget_controller.dart';
+import 'package:indoor_localization_web/controllers/map_object_controller.dart';
 import 'package:matrix_gesture_detector/matrix_gesture_detector.dart';
 
 const _size = 15.0;
@@ -25,39 +26,20 @@ class Sizer {
   Sizer(this.alignment, this.insets, this.mask);
 }
 
-class MapObjectWidget extends StatefulWidget {
-  const MapObjectWidget({
+class MapObject extends StatefulWidget {
+  const MapObject({
     Key? key,
-    required this.size,
-    required this.onTap,
-    required this.selected,
-    required this.scale,
-    required this.onSave,
-    required this.mapObjectController,
-    required this.angle,
-    this.icon,
-    this.offset,
-    this.color = Colors.grey,
+    required this.controller,
   }) : super(key: key);
-  final Size size;
-  final Offset? offset;
-  final Color color;
-  final Function(bool) onTap;
-  final bool selected;
-  final double scale;
-  final Function(Rect, Offset, double) onSave;
-  final MapObjectWidgetController mapObjectController;
-  final double angle;
-  final Icon? icon;
+  final MapObjectController controller;
 
   @override
-  _MapObjectWidgetState createState() {
-    return _MapObjectWidgetState();
+  _MapObjectState createState() {
+    return _MapObjectState();
   }
 }
 
-class _MapObjectWidgetState extends State<MapObjectWidget>
-    with TickerProviderStateMixin {
+class _MapObjectState extends State<MapObject> with TickerProviderStateMixin {
   late ValueNotifier<Rect> rect;
   Sizer currentSizer = Sizer(Alignment.center, EdgeInsets.zero, Offset.zero);
   late Rect savedRect;
@@ -68,17 +50,26 @@ class _MapObjectWidgetState extends State<MapObjectWidget>
   ValueNotifier<bool> selected = ValueNotifier(false);
   double minWidth = 10;
   double minHeight = 10;
+  ValueNotifier<int> notifier = ValueNotifier(0);
 
   @override
   void initState() {
     super.initState();
+    //bind controller actions
+    dev.log('initState');
     initController();
   }
 
   void initController() {
-    widget.mapObjectController.save = _save;
-    widget.mapObjectController.rotate = _rotate;
-    widget.mapObjectController.setWidth = (double width) {
+    widget.controller.rebuildWidget = () {
+      notifier.value++;
+    };
+    widget.controller.save = _save;
+    widget.controller.rotate = _rotate;
+    widget.controller.setSelected = (bool value) {
+      selected.value = value;
+    };
+    widget.controller.setWidth = (double width) {
       if (width < minWidth) {
         return false;
       }
@@ -90,7 +81,7 @@ class _MapObjectWidgetState extends State<MapObjectWidget>
       );
       return true;
     };
-    widget.mapObjectController.setHeight = (double height) {
+    widget.controller.setHeight = (double height) {
       if (height < minHeight) {
         return false;
       }
@@ -102,7 +93,7 @@ class _MapObjectWidgetState extends State<MapObjectWidget>
       );
       return true;
     };
-    widget.mapObjectController.setX = (double x) {
+    widget.controller.setX = (double x) {
       if (x < 0) {
         return false;
       }
@@ -114,7 +105,7 @@ class _MapObjectWidgetState extends State<MapObjectWidget>
       );
       return true;
     };
-    widget.mapObjectController.setY = (double y) {
+    widget.controller.setY = (double y) {
       if (y < 0) {
         return false;
       }
@@ -128,37 +119,40 @@ class _MapObjectWidgetState extends State<MapObjectWidget>
     };
   }
 
-  void _init(Offset offset) {
-    var realOffset = widget.offset ??
-        Offset(offset.dx - widget.size.width / 2,
-            offset.dy - widget.size.height / 2);
-
-    // log('Offset: $realOffset');
-    // log('Size: ${widget.size}');
-    var r = realOffset & widget.size;
+  void _init() {
+    //init Object data by given controller
+    var r = Offset(widget.controller.width, widget.controller.height) &
+        Size(widget.controller.width, widget.controller.height);
     rect = ValueNotifier(r);
-    angle = ValueNotifier<double>(widget.angle);
-    if (widget.offset == null) {
-      widget.onSave(rect.value, realOffset, angle.value);
-    }
+    angle = ValueNotifier<double>(widget.controller.angle);
+    selected = ValueNotifier(widget.controller.selected);
 
     matrix = ValueNotifier(Matrix4.identity());
 
-    selected = ValueNotifier(widget.selected);
-    selected.addListener(() {
-      widget.onTap(selected.value);
+    //Add listener to controller
+    rect.addListener(() {
+      _save();
+    });
+    matrix.addListener(() {
+      _save();
+    });
+    angle.addListener(() {
+      _save();
     });
   }
 
   void _save() {
-    widget.onSave(rect.value, fetchOffsetFromMatrix(), angle.value);
+    var offset = calculateOffsetFromMatrix();
+    widget.controller.onChange(rect.value.width, rect.value.height, offset.dx,
+        offset.dy, angle.value * 180 / pi);
   }
 
   void _rotate(double angle) {
-    this.angle.value += angle * pi / 180;
+    this.angle.value = angle * pi / 180;
   }
 
-  Offset fetchOffsetFromMatrix() {
+  Offset calculateOffsetFromMatrix({Matrix4? matrixIn}) {
+    matrixIn ??= matrix.value;
     var translationVector = matrix.value.getTranslation();
     Offset offsetFromMatrix =
         rect.value.topLeft.translate(translationVector.x, translationVector.y);
@@ -167,27 +161,40 @@ class _MapObjectWidgetState extends State<MapObjectWidget>
 
   @override
   Widget build(BuildContext context) {
+    _init();
     return GestureDetector(
       onTap: () {
         selected.value = !selected.value;
+        widget.controller.onSelect(selected.value);
+        _save();
       },
       child: LayoutBuilder(
         builder: (context, constraints) {
-          _init(constraints.biggest.center(Offset.zero));
-          return MatrixGestureDetector(
-            onMatrixUpdate: (m, tm, sm, rm) {
-              matrix.value =
-                  MatrixGestureDetector.compose(matrix.value, tm, sm, rm);
-            },
-            shouldTranslate: selected.value && true,
-            shouldScale: selected.value && false,
-            shouldRotate: selected.value && false,
-            focalPointAlignment: Alignment.center,
-            clipChild: false,
-            child: AnimatedBuilder(
-              animation: Listenable.merge([rect, matrix, selected, angle]),
-              builder: (ctx, child) {
-                return Transform(
+          return AnimatedBuilder(
+            animation:
+                Listenable.merge([rect, matrix, selected, angle, notifier]),
+            builder: (ctx, child) {
+              return MatrixGestureDetector(
+                onMatrixUpdate: (m, tm, sm, rm) {
+                  var newMatrix =
+                      MatrixGestureDetector.compose(matrix.value, tm, sm, rm);
+                  var newOffset =
+                      calculateOffsetFromMatrix(matrixIn: newMatrix);
+
+                  // if (newOffset.dx < 0 || newOffset.dy < 0) {
+                  //   dev.log('Kilóg');
+                  // } else {
+                  //   dev.log('Mozgatás');
+
+                  // }
+                  matrix.value = newMatrix;
+                },
+                shouldTranslate: selected.value && true,
+                shouldScale: selected.value && false,
+                shouldRotate: selected.value && false,
+                focalPointAlignment: Alignment.center,
+                clipChild: true,
+                child: Transform(
                   transform: matrix.value,
                   child: Container(
                     // color: const Color.fromRGBO(200, 200, 200, 0.8),
@@ -201,7 +208,7 @@ class _MapObjectWidgetState extends State<MapObjectWidget>
                             angle: angle.value,
                             child: Container(
                               decoration: BoxDecoration(
-                                  color: widget.color,
+                                  color: widget.controller.color,
                                   border: Border.all(
                                       color: (selected.value
                                           ? const Color.fromARGB(
@@ -209,7 +216,7 @@ class _MapObjectWidgetState extends State<MapObjectWidget>
                                           : Colors.black),
                                       width: selected.value ? 3 : 0)),
                               child: Center(
-                                child: widget.icon,
+                                child: widget.controller.icon,
                               ),
                             ),
                           ),
@@ -219,9 +226,9 @@ class _MapObjectWidgetState extends State<MapObjectWidget>
                       ],
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           );
         },
       ),
@@ -229,35 +236,64 @@ class _MapObjectWidgetState extends State<MapObjectWidget>
   }
 
   Widget _sizerBuilder(Sizer sizer, double angle) {
-    var helperRect = sizer.alignment
-        .inscribe(sizerSize * 1 / widget.scale, rect.value)
-        .shift(sizer.mask * _size * -0.6);
+    var helperRect = sizer.alignment.inscribe(sizerSize, rect.value);
 
-    var finalRect = Offset(
-          (helperRect.topLeft.dx * cos(angle * pi / 180)) -
-              (helperRect.topLeft.dy * sin(angle * pi / 180)),
-          (helperRect.topLeft.dx * sin(angle * pi / 180)) +
-              (helperRect.topLeft.dy * cos(angle * pi / 180)),
-        ) &
-        helperRect.size;
+    Offset? offset;
+
+    if (sizer.alignment == Alignment.topLeft) {
+      offset = helperRect.topLeft;
+    } else if (sizer.alignment == Alignment.topRight) {
+      offset = helperRect.topLeft;
+    } else if (sizer.alignment == Alignment.bottomLeft) {
+      offset = helperRect.topLeft;
+    } else if (sizer.alignment == Alignment.bottomRight) {
+      offset = helperRect.topLeft;
+    }
+
+    var finalRect =
+        _rotateSizer(offset ?? const Offset(0, 0), helperRect.size, angle);
+    // .shift(sizer.mask * _size * -0.6);
 
     var centerRect = Alignment.center.inscribe(sizerSize, rect.value);
 
     var interpolated = Rect.lerp(finalRect, centerRect, 0);
     return Positioned.fromRect(
       rect: interpolated ?? Rect.zero,
-      child: GestureDetector(
-        onPanStart: (details) => _panStart(sizer, details),
-        onPanUpdate: _panUpdate,
-        onPanEnd: _panEnd,
-        child: Container(
-          decoration: const ShapeDecoration(
-            shape: CircleBorder(),
-            color: Color.fromARGB(255, 16, 128, 219),
+      child: Transform.rotate(
+        angle: angle,
+        child: GestureDetector(
+          onPanStart: (details) => _panStart(sizer, details),
+          onPanUpdate: _panUpdate,
+          onPanEnd: _panEnd,
+          child: Container(
+            decoration: ShapeDecoration(
+              shape: const CircleBorder(),
+              color: sizer.alignment == Alignment.topLeft
+                  ? Colors.blue
+                  : sizer.alignment == Alignment.topRight
+                      ? Colors.red
+                      : sizer.alignment == Alignment.bottomLeft
+                          ? Colors.green
+                          : sizer.alignment == Alignment.bottomRight
+                              ? Colors.yellow
+                              : Colors.black,
+            ),
           ),
         ),
       ),
     );
+  }
+
+  Rect _rotateSizer(Offset offset, Size size, double angle) {
+    var relativeOffset = offset - rect.value.center;
+    var rotatedRelativeOffset = Offset(
+      (relativeOffset.dx * cos(angle)) - (relativeOffset.dy * sin(angle)),
+      (relativeOffset.dx * sin(angle)) + (relativeOffset.dy * cos(angle)),
+    );
+
+    var rotatedOffset = rect.value.center + rotatedRelativeOffset;
+    var finalRect = rotatedOffset & size;
+    return finalRect;
   }
 
   _panStart(Sizer sizer, DragStartDetails details) {
