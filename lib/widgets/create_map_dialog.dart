@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:html';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -251,6 +252,17 @@ class _CreateMapState extends State<CreateMap> {
                                         null &&
                                     _validateHeight(heightController.text) ==
                                         null) {
+                                  var res = await FirebaseFirestore.instance
+                                      .collection('maps')
+                                      .add({
+                                    'name': nameController.text,
+                                    'width': int.parse(widthController.text),
+                                    'height': int.parse(heightController.text),
+                                    'user_id': FirebaseAuth
+                                            .instance.currentUser?.uid ??
+                                        ''
+                                  });
+
                                   Storage localStorage = window.localStorage;
                                   localStorage['mapArgs'] = jsonEncode(MapArgs(
                                               height: double.parse(
@@ -261,7 +273,7 @@ class _CreateMapState extends State<CreateMap> {
                                                       .toString()),
                                               name: nameController.text
                                                   .toString(),
-                                              id: '',
+                                              id: res.id,
                                               userId: FirebaseAuth.instance
                                                       .currentUser?.uid ??
                                                   '')

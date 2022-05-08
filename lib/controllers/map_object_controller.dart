@@ -79,7 +79,7 @@ class MapObjectController {
       'description': description,
       'x': x,
       'y': y,
-      'iconCodePoint': icon?.icon?.codePoint ?? '',
+      'iconCodePoint': icon?.icon?.codePoint,
       'iconFamily': icon?.icon?.fontFamily ?? '',
       'width': width,
       'height': height,

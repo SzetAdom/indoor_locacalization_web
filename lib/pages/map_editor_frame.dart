@@ -32,7 +32,7 @@ class _MapEditorFrameState extends State<MapEditorFrame> {
 
   String? map;
   MapArgs? mapArgs;
-
+  ValueNotifier<String?> mapObjectsId = ValueNotifier(null);
   late Future _future;
 
   @override
@@ -57,10 +57,29 @@ class _MapEditorFrameState extends State<MapEditorFrame> {
                   margin: const EdgeInsets.only(right: 10),
                   child: IconButton(
                     onPressed: () async {
-                      var map = provider.exportAll();
-                      log(map);
-                      Storage localStorage = window.localStorage;
-                      localStorage['map'] = map;
+                      var map = provider.exportAll(mapArgs?.id ?? '');
+
+                      try {
+                        if (mapObjectsId.value == null) {
+                          var res = await FirebaseFirestore.instance
+                              .collection("mapObjects")
+                              .add(map);
+                          mapObjectsId.value = res.id;
+                        } else {
+                          FirebaseFirestore.instance
+                              .collection("mapObjects")
+                              .doc(mapObjectsId.value ?? '')
+                              .set(map);
+                        }
+                      } catch (e) {
+                        log(e.toString());
+                      }
+
+                      // .then((value) => {
+                      //       print("Map saved"),
+                      //     });
+
+// Add a new document with a generated ID
                     },
                     icon: const Icon(Icons.save),
                   ),
@@ -79,6 +98,8 @@ class _MapEditorFrameState extends State<MapEditorFrame> {
                   QuerySnapshot querySnapshot = snapshot.data as QuerySnapshot;
                   for (DocumentSnapshot item in querySnapshot.docs) {
                     var data = item.data() as Map<String, dynamic>;
+                    mapObjectsId.value = item.id;
+                    log(data.toString());
                     List<dynamic> objects = data['objects'] as List<dynamic>;
                     provider.importAll(objects);
                   }

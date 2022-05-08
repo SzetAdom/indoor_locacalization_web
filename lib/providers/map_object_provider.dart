@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
@@ -177,19 +176,22 @@ class MapObjectProvider extends ChangeNotifier {
     }
   }
 
-  String exportAll() {
+  Map<String, dynamic> exportAll(String mapId) {
     List<Map<String, dynamic>> result = [];
     for (var i = 0; i < objects.length; i++) {
       result.add(objects[i].controller.toJson());
     }
 
-    return jsonEncode(result);
+    var jsonRes = {'map_id': mapId, 'objects': result};
+
+    return jsonRes;
   }
 
   void importAll(List<dynamic> data) {
     objects.clear();
     for (var i = 0; i < data.length; i++) {
-      addObjectFromJson(data[i] as Map<String, dynamic>);
+      var currData = data[i] as Map<String, dynamic>;
+      addObjectFromJson(currData);
     }
   }
 }
