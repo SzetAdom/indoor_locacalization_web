@@ -168,7 +168,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                         data['width'],
                                                         data['height']);
                                                     Navigator.pushNamed(context,
-                                                        '/map-editor-1');
+                                                        '/map-editor-new');
                                                   }),
                                                   child: Text(
                                                     'Edit "${data['name']}"',

@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
-import 'package:indoor_localization_web/controllers/map_object_controller.dart';
-import 'package:indoor_localization_web/widgets/map_object.dart';
+import 'package:indoor_localization_web/controllers/map_object_data_model.dart';
+import 'package:indoor_localization_web/models/map_object/map_object.dart';
 
 class MapObjectProvider extends ChangeNotifier {
   String name;
@@ -23,7 +23,7 @@ class MapObjectProvider extends ChangeNotifier {
 
     objects.add(
       MapObject(
-        controller: MapObjectController.fromJson(
+        controller: MapObjectDataModelOld.fromJson(
           importObject,
           onSelect: (selected) {
             if (selected) {
@@ -43,7 +43,7 @@ class MapObjectProvider extends ChangeNotifier {
     int currIndex = objects.length;
     objects.add(
       MapObject(
-        controller: MapObjectController(
+        controller: MapObjectDataModelOld(
           'wall$currIndex',
           onSelect: (selected) {
             if (selected) {
@@ -59,7 +59,7 @@ class MapObjectProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  MapObjectController? getSelected() {
+  MapObjectDataModelOld? getSelected() {
     if (selectedIndex == -1) {
       return null;
     }

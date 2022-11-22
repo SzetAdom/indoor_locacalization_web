@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
-class MapObjectController {
+class MapObjectDataModelOld {
   late double width;
   late double height;
   late double x;
@@ -16,7 +16,7 @@ class MapObjectController {
   late String description;
   Icon? icon;
 
-  MapObjectController(
+  MapObjectDataModelOld(
     this.name, {
     this.description = '',
     this.x = 0,
@@ -29,7 +29,7 @@ class MapObjectController {
     required this.onChangeNotify,
   });
 
-  MapObjectController.fromJson(
+  MapObjectDataModelOld.fromJson(
     Map<String, dynamic> imported, {
     required this.onSelect,
     required this.onChangeNotify,

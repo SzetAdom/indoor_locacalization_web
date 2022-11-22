@@ -1,8 +1,7 @@
-import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:indoor_localization_web/controllers/map_object_controller.dart';
+import 'package:indoor_localization_web/controllers/map_object_data_model.dart';
 import 'package:matrix_gesture_detector/matrix_gesture_detector.dart';
 
 const _size = 15.0;
@@ -31,7 +30,7 @@ class MapObject extends StatefulWidget {
     Key? key,
     required this.controller,
   }) : super(key: key);
-  final MapObjectController controller;
+  final MapObjectDataModelOld controller;
 
   @override
   _MapObjectState createState() {
@@ -55,8 +54,6 @@ class _MapObjectState extends State<MapObject> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    //bind controller actions
-    dev.log('initState');
     initController();
   }
 
@@ -178,15 +175,7 @@ class _MapObjectState extends State<MapObject> with TickerProviderStateMixin {
                 onMatrixUpdate: (m, tm, sm, rm) {
                   var newMatrix =
                       MatrixGestureDetector.compose(matrix.value, tm, sm, rm);
-                  var newOffset =
-                      calculateOffsetFromMatrix(matrixIn: newMatrix);
 
-                  // if (newOffset.dx < 0 || newOffset.dy < 0) {
-                  //   dev.log('Kilóg');
-                  // } else {
-                  //   dev.log('Mozgatás');
-
-                  // }
                   matrix.value = newMatrix;
                 },
                 shouldTranslate: selected.value && true,
