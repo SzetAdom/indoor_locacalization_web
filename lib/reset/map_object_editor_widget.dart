@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/map_object_widget.dart';
 import 'package:indoor_localization_web/reset/model/map_object_metadata.dart';
 import 'package:indoor_localization_web/reset/model/map_object_model.dart';
+import 'package:indoor_localization_web/reset/sizer_widget.dart';
 import 'package:matrix_gesture_detector/matrix_gesture_detector.dart';
 
 class MapObjectEditorWidget extends StatefulWidget {
@@ -24,15 +25,21 @@ class _MapObjectEditorWidgetState extends State<MapObjectEditorWidget>
     with TickerProviderStateMixin {
   late ValueNotifier<MapObjectDataModel> mapObjectDataModel;
   bool selected = false;
-  final GlobalKey _key = GlobalKey();
+  final GlobalKey stackKey = GlobalKey();
 
   void save() async {
     await widget.saveCallback.call(mapObjectDataModel.value);
   }
 
+  void resize(MapObjectDataModel mapObjectDataModel) {
+    this.mapObjectDataModel.value = mapObjectDataModel;
+    setState(() {});
+  }
+
   @override
   void initState() {
     mapObjectDataModel = ValueNotifier(widget.mapObjectModel.data);
+
     super.initState();
   }
 
@@ -50,9 +57,9 @@ class _MapObjectEditorWidgetState extends State<MapObjectEditorWidget>
               onMatrixUpdate: (m, tm, sm, rm) {
                 var newMatrix = MatrixGestureDetector.compose(
                     mapObjectDataModel.value.matrix, tm, sm, rm);
-                log(newMatrix.getTranslation().x.toString());
+
                 mapObjectDataModel.value.moveByMatrix4(newMatrix);
-                log(mapObjectDataModel.value.toString());
+
                 setState(() {});
               },
               clipChild: true,
@@ -61,9 +68,11 @@ class _MapObjectEditorWidgetState extends State<MapObjectEditorWidget>
               shouldRotate: false,
               focalPointAlignment: Alignment.center,
               child: Container(
-                // color: Colors.green,
+                decoration: BoxDecoration(
+                    border: Border.all(
+                        color: selected ? Colors.blue : Colors.transparent)),
                 child: Stack(
-                  key: _key,
+                  key: stackKey,
                   children: [
                     MapObjecWidget(
                       widget.mapObjectModel.cloneWith(mapObjectDataModel.value),
@@ -72,13 +81,37 @@ class _MapObjectEditorWidgetState extends State<MapObjectEditorWidget>
                           onTap: () {
                             setState(() {
                               selected = !selected;
+                              log('selected: $selected');
                               widget.selectedCallback.call();
-                              log(mapObjectDataModel.value.toString());
                             });
                           },
                           child: mapObjectWidget,
                         );
                       },
+                    ),
+                    SizerWidget(
+                      mapObjectDataModel: mapObjectDataModel.value,
+                      alignment: Alignment.topLeft,
+                      onResize: resize,
+                      stackKey: stackKey,
+                    ),
+                    SizerWidget(
+                      mapObjectDataModel: mapObjectDataModel.value,
+                      alignment: Alignment.topRight,
+                      onResize: resize,
+                      stackKey: stackKey,
+                    ),
+                    SizerWidget(
+                      mapObjectDataModel: mapObjectDataModel.value,
+                      alignment: Alignment.bottomLeft,
+                      onResize: resize,
+                      stackKey: stackKey,
+                    ),
+                    SizerWidget(
+                      mapObjectDataModel: mapObjectDataModel.value,
+                      alignment: Alignment.bottomRight,
+                      onResize: resize,
+                      stackKey: stackKey,
                     ),
                   ],
                 ),

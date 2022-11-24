@@ -29,7 +29,7 @@ class _MapEditorPageState extends State<MapEditorPage> {
     mapObjects.add(MapObjectEditorWidget(
       MapObjectModel(
         id: '1',
-        color: Colors.red,
+        color: Colors.grey,
         name: 'Object 1',
         description: 'Object 1 description',
         icon: const Icon(Icons.ac_unit),
@@ -37,7 +37,7 @@ class _MapEditorPageState extends State<MapEditorPage> {
           x: 100,
           y: 100,
           width: 100,
-          height: 50,
+          height: 100,
           angle: 0,
         ),
       ),
