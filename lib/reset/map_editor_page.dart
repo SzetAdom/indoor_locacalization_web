@@ -34,11 +34,11 @@ class _MapEditorPageState extends State<MapEditorPage> {
         description: 'Object 1 description',
         icon: const Icon(Icons.ac_unit),
         data: MapObjectDataModel(
-          x: 100,
-          y: 100,
-          width: 100,
-          height: 100,
-          angle: 0,
+          x: 250,
+          y: 250,
+          width: 300,
+          height: 300,
+          angle: 30,
         ),
       ),
       selectedCallback: () {

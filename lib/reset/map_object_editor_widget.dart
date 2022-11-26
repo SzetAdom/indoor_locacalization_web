@@ -67,17 +67,19 @@ class _MapObjectEditorWidgetState extends State<MapObjectEditorWidget>
               shouldScale: false,
               shouldRotate: false,
               focalPointAlignment: Alignment.center,
-              child: Container(
-                decoration: BoxDecoration(
-                    border: Border.all(
-                        color: selected ? Colors.blue : Colors.transparent)),
-                child: Stack(
-                  key: stackKey,
-                  children: [
-                    MapObjecWidget(
-                      widget.mapObjectModel.cloneWith(mapObjectDataModel.value),
-                      child: (Widget mapObjectWidget) {
-                        return GestureDetector(
+              child: Stack(
+                key: stackKey,
+                children: [
+                  MapObjecWidget(
+                    widget.mapObjectModel.cloneWith(mapObjectDataModel.value),
+                    child: (Widget mapObjectWidget) {
+                      return Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                color:
+                                    selected ? Colors.blue : Colors.transparent,
+                                width: 2)),
+                        child: GestureDetector(
                           onTap: () {
                             setState(() {
                               selected = !selected;
@@ -86,35 +88,51 @@ class _MapObjectEditorWidgetState extends State<MapObjectEditorWidget>
                             });
                           },
                           child: mapObjectWidget,
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
+                  ),
+                  if (selected)
                     SizerWidget(
-                      mapObjectDataModel: mapObjectDataModel.value,
-                      alignment: Alignment.topLeft,
-                      onResize: resize,
-                      stackKey: stackKey,
-                    ),
+                        mapObjectDataModel: mapObjectDataModel.value,
+                        alignment: Alignment.topLeft,
+                        onResize: resize),
+                  if (selected)
                     SizerWidget(
-                      mapObjectDataModel: mapObjectDataModel.value,
-                      alignment: Alignment.topRight,
-                      onResize: resize,
-                      stackKey: stackKey,
-                    ),
+                        mapObjectDataModel: mapObjectDataModel.value,
+                        alignment: Alignment.topRight,
+                        onResize: resize),
+                  if (selected)
                     SizerWidget(
-                      mapObjectDataModel: mapObjectDataModel.value,
-                      alignment: Alignment.bottomLeft,
-                      onResize: resize,
-                      stackKey: stackKey,
-                    ),
+                        mapObjectDataModel: mapObjectDataModel.value,
+                        alignment: Alignment.bottomLeft,
+                        onResize: resize),
+                  if (selected)
                     SizerWidget(
-                      mapObjectDataModel: mapObjectDataModel.value,
-                      alignment: Alignment.bottomRight,
-                      onResize: resize,
-                      stackKey: stackKey,
-                    ),
-                  ],
-                ),
+                        mapObjectDataModel: mapObjectDataModel.value,
+                        alignment: Alignment.bottomRight,
+                        onResize: resize),
+                  if (selected)
+                    SizerWidget(
+                        mapObjectDataModel: mapObjectDataModel.value,
+                        alignment: Alignment.topCenter,
+                        onResize: resize),
+                  if (selected)
+                    SizerWidget(
+                        mapObjectDataModel: mapObjectDataModel.value,
+                        alignment: Alignment.bottomCenter,
+                        onResize: resize),
+                  if (selected)
+                    SizerWidget(
+                        mapObjectDataModel: mapObjectDataModel.value,
+                        alignment: Alignment.centerLeft,
+                        onResize: resize),
+                  if (selected)
+                    SizerWidget(
+                        mapObjectDataModel: mapObjectDataModel.value,
+                        alignment: Alignment.centerRight,
+                        onResize: resize),
+                ],
               ));
         });
   }

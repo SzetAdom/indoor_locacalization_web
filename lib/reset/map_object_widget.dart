@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/model/map_object_model.dart';
 
 class MapObjecWidget extends StatelessWidget {
-  const MapObjecWidget(this.mapObjectModel, {required this.child, Key? key})
+  const MapObjecWidget(this.mapObjectModel,
+      {required this.child, this.withoutRotation = false, Key? key})
       : super(key: key);
+  final bool withoutRotation;
 
   final MapObjectModel mapObjectModel;
   final Widget Function(Widget child) child;
@@ -17,9 +19,9 @@ class MapObjecWidget extends StatelessWidget {
         height: mapObjectModel.data.height,
       ),
       child: Transform.rotate(
-        angle: mapObjectModel.data.angleInRadiant,
+        angle: withoutRotation ? 0 : mapObjectModel.data.angleInRadiant,
         child: child.call(Container(
-          color: mapObjectModel.color,
+          color: withoutRotation ? Colors.red : mapObjectModel.color,
           child: Center(
             child: mapObjectModel.icon,
           ),

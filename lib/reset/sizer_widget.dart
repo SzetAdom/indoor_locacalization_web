@@ -1,25 +1,24 @@
 import 'dart:developer' as dev;
 import 'dart:math';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/model/map_object_metadata.dart';
 
-class SizerWidget extends StatefulWidget {
+class SizerWidget extends StatelessWidget {
   const SizerWidget(
       {required this.mapObjectDataModel,
       required this.alignment,
       required this.onResize,
-      this.size = const Size(15, 15),
-      required this.stackKey,
+      this.size = const Size(10, 10),
       Key? key})
       : super(key: key);
 
   final MapObjectDataModel mapObjectDataModel;
   final Size size;
   final Alignment alignment;
-  final Offset offset = const Offset(10, 10);
   final Function(MapObjectDataModel mapObjectDataModel) onResize;
-  final GlobalKey stackKey;
+  final double dragSensitivity = 2.2;
 
   Offset getAlignMultipliers() {
     var x = 0.0;
@@ -36,47 +35,48 @@ class SizerWidget extends StatefulWidget {
     } else if (alignment == Alignment.bottomRight) {
       x = 1;
       y = 1;
+    } else if (alignment == Alignment.topCenter) {
+      x = 0;
+      y = -1;
+    } else if (alignment == Alignment.bottomCenter) {
+      x = 0;
+      y = 1;
+    } else if (alignment == Alignment.centerLeft) {
+      x = -1;
+      y = 0;
+    } else if (alignment == Alignment.centerRight) {
+      x = 1;
+      y = 0;
+    } else if (alignment == Alignment.center) {
+      x = 0;
+      y = 0;
     }
     return Offset(x, y);
   }
 
-  @override
-  State<SizerWidget> createState() => _SizerWidgetState();
-}
+  Offset getOriginalPosition() {
+    var originalEdgeinsets = mapObjectDataModel.getLocalEdgeInsets();
 
-class _SizerWidgetState extends State<SizerWidget> {
-  late Alignment alignmnetWithoutOffset;
-  late Rect sizer;
-  late Rect sizerWithoutOffset;
-
-  late EdgeInsets _edgeInsets;
-
-  late Offset savedOffset;
-
-  Alignment getAlignMent() {
-    var mulitplier = widget.getAlignMultipliers();
-    var x = mulitplier.dx;
-    var y = mulitplier.dy;
-    var angle = widget.mapObjectDataModel.angleInRadiant;
-
-    double xOffsetPercentage =
-        ((widget.mapObjectDataModel.width / 2) + widget.offset.dx) /
-            (widget.mapObjectDataModel.width / 2);
-    double yOffsetPercentage =
-        ((widget.mapObjectDataModel.height / 2) + widget.offset.dy) /
-            (widget.mapObjectDataModel.height / 2);
-
-    ///Az offset itt nem eltolást(maszkot) jelent, hanem mint vektor használjuk
-    Offset rotatedEdge = rotate(x: x, y: y, angle: angle);
-
-    alignmnetWithoutOffset = Alignment(rotatedEdge.dx, rotatedEdge.dy);
-
-    x = x * xOffsetPercentage;
-    y = y * yOffsetPercentage;
-
-    rotatedEdge = rotate(x: x, y: y, angle: angle);
-    var res = Alignment(rotatedEdge.dx, rotatedEdge.dy);
-    return res;
+    if (alignment == Alignment.topLeft) {
+      return Offset(originalEdgeinsets.left, originalEdgeinsets.top);
+    } else if (alignment == Alignment.topRight) {
+      return Offset(originalEdgeinsets.right, originalEdgeinsets.top);
+    } else if (alignment == Alignment.bottomLeft) {
+      return Offset(originalEdgeinsets.left, originalEdgeinsets.bottom);
+    } else if (alignment == Alignment.bottomRight) {
+      return Offset(originalEdgeinsets.right, originalEdgeinsets.bottom);
+    } else if (alignment == Alignment.topCenter) {
+      return Offset(0, originalEdgeinsets.top);
+    } else if (alignment == Alignment.bottomCenter) {
+      return Offset(0, originalEdgeinsets.bottom);
+    } else if (alignment == Alignment.centerLeft) {
+      return Offset(originalEdgeinsets.left, 0);
+    } else if (alignment == Alignment.centerRight) {
+      return Offset(originalEdgeinsets.right, 0);
+    } else if (alignment == Alignment.center) {
+      return const Offset(0, 0);
+    }
+    return Offset.zero;
   }
 
   Offset rotate({required double x, required double y, required angle}) {
@@ -85,100 +85,80 @@ class _SizerWidgetState extends State<SizerWidget> {
     return Offset(rotatedX, rotatedY);
   }
 
-  @override
-  void initState() {
-    super.initState();
-    if (widget.alignment == Alignment.topLeft) {
-      _edgeInsets = const EdgeInsets.only(top: 1, left: 1);
-    } else if (widget.alignment == Alignment.topRight) {
-      _edgeInsets = const EdgeInsets.only(top: 1, right: 1);
-    } else if (widget.alignment == Alignment.bottomLeft) {
-      _edgeInsets = const EdgeInsets.only(bottom: 1, left: 1);
-    } else if (widget.alignment == Alignment.bottomRight) {
-      _edgeInsets = const EdgeInsets.only(bottom: 1, right: 1);
-    }
-  }
+  Rect getSizer() {
+    var edgePosition = getOriginalPosition();
 
-  @override
-  Widget build(BuildContext context) {
-    sizer =
-        getAlignMent().inscribe(widget.size, widget.mapObjectDataModel.rect);
-    sizerWithoutOffset = alignmnetWithoutOffset.inscribe(
-        widget.size, widget.mapObjectDataModel.rect);
+    edgePosition = rotate(
+        x: edgePosition.dx,
+        y: edgePosition.dy,
+        angle: mapObjectDataModel.angleInRadiant);
 
-    return Positioned.fromRect(
-      rect: sizer,
-      child: GestureDetector(
-        onPanStart: (details) => _panStart(details),
-        onPanUpdate: _panUpdate,
-        onPanEnd: _panEnd,
-        child: Container(
-          decoration: ShapeDecoration(
-            shape: const CircleBorder(),
-            color: widget.alignment == Alignment.topLeft
-                ? Colors.blue
-                : widget.alignment == Alignment.topRight
-                    ? Colors.red
-                    : widget.alignment == Alignment.bottomLeft
-                        ? Colors.green
-                        : widget.alignment == Alignment.bottomRight
-                            ? Colors.yellow
-                            : Colors.black,
-          ),
-        ),
-      ),
-    );
+    edgePosition = mapObjectDataModel.toGlobalOffset(edgePosition);
+
+    return Rect.fromCenter(
+        center: edgePosition, width: size.width, height: size.height);
   }
 
   _panStart(DragStartDetails details) {
     dev.log('drag started');
-    // savedOffset = _stackOffset(details.globalPosition);
   }
 
   _panUpdate(DragUpdateDetails details) {
     var delta = details.delta;
+
     dev.log('delta: $delta');
 
-    /// delta = (old-details) * -1
-    var newX = widget.mapObjectDataModel.x + delta.dx;
-    var newY = widget.mapObjectDataModel.y + delta.dy;
-    var newWidth = widget.mapObjectDataModel.width +
-        delta.dx * widget.getAlignMultipliers().dx * 2;
-    var newHeight = widget.mapObjectDataModel.height +
-        delta.dy * widget.getAlignMultipliers().dy * 2;
+    if (getAlignMultipliers().dx == 0 || getAlignMultipliers().dy == 0) {
+      var alignmentVector = rotate(
+          x: getAlignMultipliers().dx,
+          y: getAlignMultipliers().dy,
+          angle: mapObjectDataModel.angleInRadiant);
+
+      var component =
+          (delta.dx * alignmentVector.dx + delta.dy * alignmentVector.dy) /
+              (alignmentVector.dx * alignmentVector.dx +
+                  alignmentVector.dy * alignmentVector.dy);
+      delta = Offset(
+          component * alignmentVector.dx, component * alignmentVector.dy);
+    }
+
+    var rotatedDelta = rotate(
+        x: delta.dx, y: delta.dy, angle: -mapObjectDataModel.angleInRadiant);
+
+    var newX = mapObjectDataModel.x + (delta.dx / 2 * dragSensitivity);
+    var newY = mapObjectDataModel.y + (delta.dy / 2 * dragSensitivity);
+
+    var newWidth = mapObjectDataModel.width +
+        (rotatedDelta.dx * getAlignMultipliers().dx * dragSensitivity);
+    var newHeight = mapObjectDataModel.height +
+        (rotatedDelta.dy * getAlignMultipliers().dy * dragSensitivity);
     var newMapObjectData = MapObjectDataModel(
         x: newX,
         y: newY,
         width: newWidth,
         height: newHeight,
-        angle: widget.mapObjectDataModel.angle);
-    widget.onResize(newMapObjectData);
-
-    // var leftInset = _edgeInsets.left * delta.dx;
-    // var rightInset = _edgeInsets.right * delta.dx;
-    // var topInset = _edgeInsets.top * delta.dy;
-    // var bottomInset = _edgeInsets.bottom * delta.dy;
-
-    // var insets = EdgeInsets.fromLTRB(
-    //   leftInset,
-    //   topInset,
-    //   rightInset,
-    //   bottomInset,
-    // );
-    // var newRectValue = insets.inflateRect(widget.mapObjectDataModel.localRect);
-    // newRectValue.center = widget.mapObjectDataModel.localRect.center;
-    // dev.log('oldRect: ${widget.mapObjectDataModel.localRect}');
-    // dev.log('newRect: $newRectValue');
-    // widget.onResize(newRectValue);
+        angle: mapObjectDataModel.angle);
+    onResize(newMapObjectData);
   }
 
   _panEnd(DragEndDetails details) {
     dev.log('drag ended');
   }
 
-  // Offset _stackOffset(Offset offset) {
-  //   RenderBox rb =
-  //       widget.stackKey.currentContext?.findRenderObject() as RenderBox;
-  //   return rb.globalToLocal(offset);
-  // }
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fromRect(
+      rect: getSizer(),
+      child: GestureDetector(
+        dragStartBehavior: DragStartBehavior.down,
+        onPanStart: (details) => _panStart(details),
+        onPanUpdate: _panUpdate,
+        onPanEnd: _panEnd,
+        child: Container(
+          decoration:
+              const ShapeDecoration(shape: CircleBorder(), color: Colors.blue),
+        ),
+      ),
+    );
+  }
 }

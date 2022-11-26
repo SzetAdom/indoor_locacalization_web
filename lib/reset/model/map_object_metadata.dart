@@ -24,18 +24,30 @@ class MapObjectDataModel {
 
   double get angleInRadiant => (angle * (pi / 180));
 
-  Offset get localCenter => Offset(x, y);
-
-  EdgeInsets get localEdgeInsets => EdgeInsets.fromLTRB(
-      x - (width / 2), y - (height / 2), x + (width / 2), y + (height / 2));
-
-  Rect get localRect => Rect.fromCenter(
-        center: Offset(x, y),
-        width: width,
-        height: height,
-      );
-
   Offset get center => rect.center;
+
+  EdgeInsets get edgeInsets =>
+      EdgeInsets.fromLTRB(rect.left, rect.top, rect.right, rect.bottom);
+
+  EdgeInsets getLocalEdgeInsets() {
+    var leftOffset = toLocalOffset(Offset(edgeInsets.left, 0));
+    var rightOffset = toLocalOffset(Offset(edgeInsets.right, 0));
+    var topOffset = toLocalOffset(Offset(0, edgeInsets.top));
+    var bottomOffset = toLocalOffset(Offset(0, edgeInsets.bottom));
+
+    return EdgeInsets.fromLTRB(
+        leftOffset.dx, topOffset.dy, rightOffset.dx, bottomOffset.dy);
+  }
+
+  Offset toLocalOffset(Offset globalOFfset) {
+    var res = globalOFfset - center;
+    return res;
+  }
+
+  Offset toGlobalOffset(Offset localOffset) {
+    var res = localOffset + center;
+    return res;
+  }
 
   Matrix4 get matrix => Matrix4.identity()..translate(x, y);
 
@@ -46,9 +58,6 @@ class MapObjectDataModel {
     x = translationVector.x;
     y = translationVector.y;
   }
-
-  EdgeInsets get edgeInsets =>
-      EdgeInsets.fromLTRB(rect.left, rect.top, rect.right, rect.bottom);
 
   void resizeByRect(Rect rect) {
     x = rect.center.dx;
