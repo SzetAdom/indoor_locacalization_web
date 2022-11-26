@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:indoor_localization_web/reset/model/map_object_metadata.dart';
+import 'package:indoor_localization_web/reset/model/map_object/map_object_data_model.dart';
 
 class SizerWidget extends StatelessWidget {
   const SizerWidget(

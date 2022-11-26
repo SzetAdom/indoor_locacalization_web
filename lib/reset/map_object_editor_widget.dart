@@ -1,21 +1,23 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/map_object_widget.dart';
-import 'package:indoor_localization_web/reset/model/map_object_metadata.dart';
-import 'package:indoor_localization_web/reset/model/map_object_model.dart';
+import 'package:indoor_localization_web/reset/model/map_object/map_object_data_model.dart';
+import 'package:indoor_localization_web/reset/model/map_object/map_object_model.dart';
 import 'package:indoor_localization_web/reset/sizer_widget.dart';
 import 'package:matrix_gesture_detector/matrix_gesture_detector.dart';
 
 class MapObjectEditorWidget extends StatefulWidget {
   const MapObjectEditorWidget(this.mapObjectModel,
-      {required this.saveCallback, required this.selectedCallback, Key? key})
+      {required this.saveCallback,
+      required this.selectedCallback,
+      this.selected = false,
+      Key? key})
       : super(key: key);
 
   final MapObjectModel mapObjectModel;
   final Future<void> Function(MapObjectDataModel mapObjectDataModel)
       saveCallback;
-  final Function selectedCallback;
+  final Function(bool selected) selectedCallback;
+  final bool selected;
 
   @override
   State<MapObjectEditorWidget> createState() => _MapObjectEditorWidgetState();
@@ -24,7 +26,7 @@ class MapObjectEditorWidget extends StatefulWidget {
 class _MapObjectEditorWidgetState extends State<MapObjectEditorWidget>
     with TickerProviderStateMixin {
   late ValueNotifier<MapObjectDataModel> mapObjectDataModel;
-  bool selected = false;
+
   final GlobalKey stackKey = GlobalKey();
 
   void save() async {
@@ -63,7 +65,7 @@ class _MapObjectEditorWidgetState extends State<MapObjectEditorWidget>
                 setState(() {});
               },
               clipChild: true,
-              shouldTranslate: selected && true,
+              shouldTranslate: widget.selected && true,
               shouldScale: false,
               shouldRotate: false,
               focalPointAlignment: Alignment.center,
@@ -76,58 +78,55 @@ class _MapObjectEditorWidgetState extends State<MapObjectEditorWidget>
                       return Container(
                         decoration: BoxDecoration(
                             border: Border.all(
-                                color:
-                                    selected ? Colors.blue : Colors.transparent,
+                                color: widget.selected
+                                    ? Colors.blue
+                                    : Colors.transparent,
                                 width: 2)),
                         child: GestureDetector(
                           onTap: () {
-                            setState(() {
-                              selected = !selected;
-                              log('selected: $selected');
-                              widget.selectedCallback.call();
-                            });
+                            widget.selectedCallback.call(!widget.selected);
                           },
                           child: mapObjectWidget,
                         ),
                       );
                     },
                   ),
-                  if (selected)
+                  if (widget.selected)
                     SizerWidget(
                         mapObjectDataModel: mapObjectDataModel.value,
                         alignment: Alignment.topLeft,
                         onResize: resize),
-                  if (selected)
+                  if (widget.selected)
                     SizerWidget(
                         mapObjectDataModel: mapObjectDataModel.value,
                         alignment: Alignment.topRight,
                         onResize: resize),
-                  if (selected)
+                  if (widget.selected)
                     SizerWidget(
                         mapObjectDataModel: mapObjectDataModel.value,
                         alignment: Alignment.bottomLeft,
                         onResize: resize),
-                  if (selected)
+                  if (widget.selected)
                     SizerWidget(
                         mapObjectDataModel: mapObjectDataModel.value,
                         alignment: Alignment.bottomRight,
                         onResize: resize),
-                  if (selected)
+                  if (widget.selected)
                     SizerWidget(
                         mapObjectDataModel: mapObjectDataModel.value,
                         alignment: Alignment.topCenter,
                         onResize: resize),
-                  if (selected)
+                  if (widget.selected)
                     SizerWidget(
                         mapObjectDataModel: mapObjectDataModel.value,
                         alignment: Alignment.bottomCenter,
                         onResize: resize),
-                  if (selected)
+                  if (widget.selected)
                     SizerWidget(
                         mapObjectDataModel: mapObjectDataModel.value,
                         alignment: Alignment.centerLeft,
                         onResize: resize),
-                  if (selected)
+                  if (widget.selected)
                     SizerWidget(
                         mapObjectDataModel: mapObjectDataModel.value,
                         alignment: Alignment.centerRight,

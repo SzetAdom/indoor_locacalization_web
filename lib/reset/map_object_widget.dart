@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:indoor_localization_web/reset/model/map_object_model.dart';
+import 'package:indoor_localization_web/reset/model/map_object/map_object_model.dart';
 
 class MapObjecWidget extends StatelessWidget {
   const MapObjecWidget(this.mapObjectModel,
