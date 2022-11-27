@@ -35,7 +35,7 @@ class _MapEditorState extends State<MapEditor> {
 
   @override
   Widget build(BuildContext context) {
-    var _mapObjectController = Provider.of<MapObjectProvider>(context);
+    var mapObjectController = Provider.of<MapObjectProvider>(context);
     return Row(
       children: [
         Expanded(
@@ -46,7 +46,7 @@ class _MapEditorState extends State<MapEditor> {
                   return MatrixGestureDetector(
                     shouldRotate: false,
                     shouldScale: false,
-                    shouldTranslate: _mapObjectController.mapSelected,
+                    shouldTranslate: mapObjectController.mapSelected,
                     onMatrixUpdate: (m, tm, sm, rm) {
                       matrix =
                           MatrixGestureDetector.compose(matrix, tm, sm, null);
@@ -55,7 +55,7 @@ class _MapEditorState extends State<MapEditor> {
                     },
                     child: GestureDetector(
                       onTap: () {
-                        _mapObjectController.setMapSelected();
+                        mapObjectController.setMapSelected();
                       },
                       child: Container(
                         width: double.infinity,
@@ -82,11 +82,12 @@ class _MapEditorState extends State<MapEditor> {
                                     color: Colors.grey.shade200,
                                     child: GridPaper(
                                       color: Colors.black,
+                                      
                                       child: Stack(
                                         alignment: Alignment.center,
                                         children: [
                                           // if (_doneBuilding)
-                                          ..._mapObjectController.objects
+                                          ...mapObjectController.objects
                                         ],
                                       ),
                                     ),
@@ -189,13 +190,13 @@ class _MapObjectControlPanelState extends State<MapObjectControlPanel> {
       required String hintText,
       String defaultValue = '',
       required Function onSave}) async {
-    final TextEditingController _textFieldController = TextEditingController();
-    _textFieldController.text = defaultValue;
+    final TextEditingController textFieldController = TextEditingController();
+    textFieldController.text = defaultValue;
 
     void _onSave(BuildContext context) {
-      if (_textFieldController.text != '') {
+      if (textFieldController.text != '') {
         setState(() {
-          onSave(_textFieldController.text);
+          onSave(textFieldController.text);
           Navigator.pop(context);
         });
       }
@@ -207,7 +208,7 @@ class _MapObjectControlPanelState extends State<MapObjectControlPanel> {
           return AlertDialog(
             title: Text(title),
             content: TextField(
-              controller: _textFieldController,
+              controller: textFieldController,
               decoration: InputDecoration(hintText: hintText),
               onSubmitted: (value) {
                 _onSave(context);

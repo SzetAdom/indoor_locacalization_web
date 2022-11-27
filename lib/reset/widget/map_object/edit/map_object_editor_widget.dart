@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:indoor_localization_web/reset/map_object_widget.dart';
 import 'package:indoor_localization_web/reset/model/map_object/map_object_data_model.dart';
 import 'package:indoor_localization_web/reset/model/map_object/map_object_model.dart';
-import 'package:indoor_localization_web/reset/sizer_widget.dart';
+import 'package:indoor_localization_web/reset/widget/map_object/edit/rotater_widget.dart';
+import 'package:indoor_localization_web/reset/widget/map_object/edit/sizer_widget.dart';
+import 'package:indoor_localization_web/reset/widget/map_object/map_object_widget.dart';
 import 'package:matrix_gesture_detector/matrix_gesture_detector.dart';
 
 class MapObjectEditorWidget extends StatefulWidget {
@@ -18,6 +19,7 @@ class MapObjectEditorWidget extends StatefulWidget {
       saveCallback;
   final Function(bool selected) selectedCallback;
   final bool selected;
+  final Size _minSize = const Size(20, 20);
 
   @override
   State<MapObjectEditorWidget> createState() => _MapObjectEditorWidgetState();
@@ -33,8 +35,30 @@ class _MapObjectEditorWidgetState extends State<MapObjectEditorWidget>
     await widget.saveCallback.call(mapObjectDataModel.value);
   }
 
-  void resize(MapObjectDataModel mapObjectDataModel) {
-    this.mapObjectDataModel.value = mapObjectDataModel;
+  void resize(MapObjectDataModel newModel) {
+    if (newModel.width < widget._minSize.width ||
+        newModel.height < widget._minSize.height) {
+      return;
+    }
+    // bool outOfBounds = false;
+    // if (newModel.width < widget._minSize.width) {
+    //   newModel.width = widget._minSize.width;
+    //   outOfBounds = true;
+    // }
+    // if (newModel.height < widget._minSize.height) {
+    //   newModel.height = widget._minSize.height;
+    //   outOfBounds = true;
+    // }
+    // if (outOfBounds) {
+    //   newModel.x = mapObjectDataModel.value.x;
+    //   newModel.y = mapObjectDataModel.value.y;
+    // }
+    mapObjectDataModel.value = newModel;
+    setState(() {});
+  }
+
+  void rotate(double angle) {
+    mapObjectDataModel.value = mapObjectDataModel.value.copyWith(angle: angle);
     setState(() {});
   }
 
@@ -91,6 +115,10 @@ class _MapObjectEditorWidgetState extends State<MapObjectEditorWidget>
                       );
                     },
                   ),
+                  if (widget.selected)
+                    RotaterWidget(
+                        mapObjectDataModel: mapObjectDataModel.value,
+                        onRotate: rotate),
                   if (widget.selected)
                     SizerWidget(
                         mapObjectDataModel: mapObjectDataModel.value,

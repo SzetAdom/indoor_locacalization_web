@@ -1,4 +1,3 @@
-import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:flutter/gestures.dart';
@@ -14,49 +13,31 @@ class SizerWidget extends StatelessWidget {
       Key? key})
       : super(key: key);
 
+  /// The map object data model
   final MapObjectDataModel mapObjectDataModel;
+
+  /// The size of the sizer
   final Size size;
+
+  /// The alignment of the sizer, relative to the map object
   final Alignment alignment;
+
+  /// The callback function when the sizer is resized
   final Function(MapObjectDataModel mapObjectDataModel) onResize;
+
+  /// The sensitivity of the drag
   final double dragSensitivity = 2.2;
 
-  Offset getAlignMultipliers() {
-    var x = 0.0;
-    var y = 0.0;
-    if (alignment == Alignment.topLeft) {
-      x = -1;
-      y = -1;
-    } else if (alignment == Alignment.topRight) {
-      x = 1;
-      y = -1;
-    } else if (alignment == Alignment.bottomLeft) {
-      x = -1;
-      y = 1;
-    } else if (alignment == Alignment.bottomRight) {
-      x = 1;
-      y = 1;
-    } else if (alignment == Alignment.topCenter) {
-      x = 0;
-      y = -1;
-    } else if (alignment == Alignment.bottomCenter) {
-      x = 0;
-      y = 1;
-    } else if (alignment == Alignment.centerLeft) {
-      x = -1;
-      y = 0;
-    } else if (alignment == Alignment.centerRight) {
-      x = 1;
-      y = 0;
-    } else if (alignment == Alignment.center) {
-      x = 0;
-      y = 0;
-    }
-    return Offset(x, y);
+  /// Rotate a point (helper function)
+  Offset _rotate({required double x, required double y, required angle}) {
+    var rotatedX = x * cos(angle) - y * sin(angle);
+    var rotatedY = x * sin(angle) + y * cos(angle);
+    return Offset(rotatedX, rotatedY);
   }
 
-  Offset getOriginalPosition() {
+  /// The position of the sizer relative to the center of the map object withouth rotation
+  Offset _getOriginalPosition() {
     var originalEdgeinsets = mapObjectDataModel.getLocalEdgeInsets();
-
     if (alignment == Alignment.topLeft) {
       return Offset(originalEdgeinsets.left, originalEdgeinsets.top);
     } else if (alignment == Alignment.topRight) {
@@ -79,16 +60,11 @@ class SizerWidget extends StatelessWidget {
     return Offset.zero;
   }
 
-  Offset rotate({required double x, required double y, required angle}) {
-    var rotatedX = x * cos(angle) - y * sin(angle);
-    var rotatedY = x * sin(angle) + y * cos(angle);
-    return Offset(rotatedX, rotatedY);
-  }
+  /// Get the global (relative to the map top left corner) position of the sizer
+  Rect _getSizer() {
+    var edgePosition = _getOriginalPosition();
 
-  Rect getSizer() {
-    var edgePosition = getOriginalPosition();
-
-    edgePosition = rotate(
+    edgePosition = _rotate(
         x: edgePosition.dx,
         y: edgePosition.dy,
         angle: mapObjectDataModel.angleInRadiant);
@@ -99,61 +75,56 @@ class SizerWidget extends StatelessWidget {
         center: edgePosition, width: size.width, height: size.height);
   }
 
-  _panStart(DragStartDetails details) {
-    dev.log('drag started');
-  }
-
+  /// Resize the map object when the sizer is dragged
   _panUpdate(DragUpdateDetails details) {
+    ///Vector of the drag gesture in the local coordinate system
     var delta = details.delta;
 
-    dev.log('delta: $delta');
-
-    if (getAlignMultipliers().dx == 0 || getAlignMultipliers().dy == 0) {
-      var alignmentVector = rotate(
-          x: getAlignMultipliers().dx,
-          y: getAlignMultipliers().dy,
+    ///Filter the drag vector to the direction of the sizer, only when sides are dragged
+    if (alignment.x == 0 || alignment.y == 0) {
+      var alignmentVector = _rotate(
+          x: alignment.x,
+          y: alignment.y,
           angle: mapObjectDataModel.angleInRadiant);
 
-      var component =
+      var projection =
           (delta.dx * alignmentVector.dx + delta.dy * alignmentVector.dy) /
               (alignmentVector.dx * alignmentVector.dx +
                   alignmentVector.dy * alignmentVector.dy);
       delta = Offset(
-          component * alignmentVector.dx, component * alignmentVector.dy);
+          projection * alignmentVector.dx, projection * alignmentVector.dy);
     }
 
-    var rotatedDelta = rotate(
+    ///Remove the rotaion of the drag (the size change must be calculated without rotation)
+    var rotatedDelta = _rotate(
         x: delta.dx, y: delta.dy, angle: -mapObjectDataModel.angleInRadiant);
 
+    ///Calculate the new size of the map object
     var newX = mapObjectDataModel.x + (delta.dx / 2 * dragSensitivity);
     var newY = mapObjectDataModel.y + (delta.dy / 2 * dragSensitivity);
 
     var newWidth = mapObjectDataModel.width +
-        (rotatedDelta.dx * getAlignMultipliers().dx * dragSensitivity);
+        (rotatedDelta.dx * alignment.x * dragSensitivity);
     var newHeight = mapObjectDataModel.height +
-        (rotatedDelta.dy * getAlignMultipliers().dy * dragSensitivity);
+        (rotatedDelta.dy * alignment.y * dragSensitivity);
     var newMapObjectData = MapObjectDataModel(
         x: newX,
         y: newY,
         width: newWidth,
         height: newHeight,
         angle: mapObjectDataModel.angle);
-    onResize(newMapObjectData);
-  }
 
-  _panEnd(DragEndDetails details) {
-    dev.log('drag ended');
+    ///Update the map object
+    onResize(newMapObjectData);
   }
 
   @override
   Widget build(BuildContext context) {
     return Positioned.fromRect(
-      rect: getSizer(),
+      rect: _getSizer(),
       child: GestureDetector(
         dragStartBehavior: DragStartBehavior.down,
-        onPanStart: (details) => _panStart(details),
         onPanUpdate: _panUpdate,
-        onPanEnd: _panEnd,
         child: Container(
           decoration:
               const ShapeDecoration(shape: CircleBorder(), color: Colors.blue),

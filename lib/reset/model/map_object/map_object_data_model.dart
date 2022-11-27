@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -14,7 +15,10 @@ class MapObjectDataModel {
       required this.y,
       required this.width,
       required this.height,
-      required this.angle});
+      required this.angle}) {
+    angle = angle % 360;
+    dev.log(angle.toString());
+  }
 
   Rect get rect => Rect.fromCenter(
         center: Offset(x, y),
@@ -69,5 +73,21 @@ class MapObjectDataModel {
   @override
   String toString() {
     return 'MapObjectDataModel(x: $x, y: $y, width: $width, height: $height, angle: $angle)';
+  }
+
+  MapObjectDataModel copyWith({
+    double? x,
+    double? y,
+    double? width,
+    double? height,
+    double? angle,
+  }) {
+    return MapObjectDataModel(
+      x: x ?? this.x,
+      y: y ?? this.y,
+      width: width ?? this.width,
+      height: height ?? this.height,
+      angle: angle ?? this.angle,
+    );
   }
 }

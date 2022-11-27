@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:indoor_localization_web/reset/map_object_editor_widget.dart';
+import 'package:indoor_localization_web/reset/widget/map_object/edit/map_object_editor_widget.dart';
 import 'package:indoor_localization_web/reset/model/map/map_data_model.dart';
 import 'package:indoor_localization_web/reset/model/map_object/map_object_data_model.dart';
 import 'package:indoor_localization_web/reset/model/map_object/map_object_model.dart';
