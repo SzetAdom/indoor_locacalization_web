@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:indoor_localization_web/reset/model/map_object/map_object_data_model.dart';
+import 'package:indoor_localization_web/model/map_object/map_object_data_model.dart';
 
 class MapObjectModel {
   Color color;

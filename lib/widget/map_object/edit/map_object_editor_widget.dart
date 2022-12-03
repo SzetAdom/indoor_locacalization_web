@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:indoor_localization_web/reset/model/map_object/map_object_data_model.dart';
-import 'package:indoor_localization_web/reset/model/map_object/map_object_model.dart';
-import 'package:indoor_localization_web/reset/settings.dart';
-import 'package:indoor_localization_web/reset/widget/map_object/edit/rotater_widget.dart';
-import 'package:indoor_localization_web/reset/widget/map_object/edit/sizer_widget.dart';
-import 'package:indoor_localization_web/reset/widget/map_object/map_object_widget.dart';
+import 'package:indoor_localization_web/model/map_object/map_object_data_model.dart';
+import 'package:indoor_localization_web/model/map_object/map_object_model.dart';
+import 'package:indoor_localization_web/settings.dart';
+import 'package:indoor_localization_web/widget/map_object/edit/rotater_widget.dart';
+import 'package:indoor_localization_web/widget/map_object/edit/sizer_widget.dart';
+import 'package:indoor_localization_web/widget/map_object/map_object_widget.dart';
 import 'package:matrix_gesture_detector/matrix_gesture_detector.dart';
 
 class MapObjectEditorWidget extends StatefulWidget {

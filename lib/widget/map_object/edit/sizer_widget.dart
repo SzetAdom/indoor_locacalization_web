@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:indoor_localization_web/reset/controller/map_object_editor_controller.dart';
-import 'package:indoor_localization_web/reset/model/map_object/map_object_data_model.dart';
+import 'package:indoor_localization_web/controller/map_object_editor_controller.dart';
+import 'package:indoor_localization_web/model/map_object/map_object_data_model.dart';
 import 'package:provider/provider.dart';
 
 class SizerWidget extends StatelessWidget {

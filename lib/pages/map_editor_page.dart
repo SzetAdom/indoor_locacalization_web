@@ -4,8 +4,8 @@ import 'dart:html';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:indoor_localization_web/reset/controller/map_object_editor_controller.dart';
-import 'package:indoor_localization_web/reset/widget/map_editor/map_editor_control_panel.dart';
+import 'package:indoor_localization_web/controller/map_object_editor_controller.dart';
+import 'package:indoor_localization_web/widget/map_editor/map_editor_control_panel.dart';
 import 'package:matrix_gesture_detector/matrix_gesture_detector.dart';
 import 'package:provider/provider.dart';
 
@@ -59,8 +59,8 @@ class _MapEditorPageState extends State<MapEditorPage> {
     return Scaffold(
       appBar: AppBar(
         actions: [
-IconButton(onPressed: controller.addObject, icon: const Icon(Icons.add)),
-
+          IconButton(
+              onPressed: controller.addObject, icon: const Icon(Icons.add)),
           IconButton(
             onPressed: () {
               controller.save();
@@ -150,8 +150,10 @@ IconButton(onPressed: controller.addObject, icon: const Icon(Icons.add)),
                                                   maxHeight: double.infinity,
                                                   maxWidth: double.infinity,
                                                   child: Container(
-                                                    width: controller.mapDataModel.width,
-                                                    height: controller.mapDataModel.height,
+                                                    width: controller
+                                                        .mapDataModel.width,
+                                                    height: controller
+                                                        .mapDataModel.height,
                                                     decoration:
                                                         const BoxDecoration(
                                                       color: Colors.white,
