@@ -144,8 +144,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                             ),
                             FutureBuilder(
-                                future: _future,
+                                future: loadMaps(),
                                 builder: (context, snapshot) {
+                                  log('main page refresh');
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
                                     return const Center(child: Text("Loading"));
