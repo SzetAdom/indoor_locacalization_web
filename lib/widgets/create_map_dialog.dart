@@ -1,11 +1,7 @@
-import 'dart:convert';
-import 'dart:html';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:indoor_localization_web/models/map_args.dart';
 
 class CreateMap extends StatefulWidget {
   const CreateMap({Key? key}) : super(key: key);
@@ -264,27 +260,8 @@ class _CreateMapState extends State<CreateMap> {
                                         ''
                                   });
 
-                                  Storage localStorage = window.localStorage;
-                                  localStorage['mapArgs'] = jsonEncode(MapArgs(
-                                              height: double.parse(
-                                                  heightController.text
-                                                      .toString()),
-                                              width: double.parse(
-                                                  widthController.text
-                                                      .toString()),
-                                              name: nameController.text
-                                                  .toString(),
-                                              id: res.id,
-                                              userId: FirebaseAuth.instance
-                                                      .currentUser?.uid ??
-                                                  '')
-                                          .toJson())
-                                      .toString();
-                                  Navigator.pop(context);
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/map-editor-1',
-                                  );
+                                  Navigator.pushNamed(context, '/map-editor',
+                                      arguments: res.id);
                                 }
                               }
                             },

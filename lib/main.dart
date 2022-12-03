@@ -153,8 +153,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     top: 20),
                                                 child: TextButton(
                                                   onPressed: (() {
-                                                    Navigator.pushNamed(context,
-                                                        '/map-editor-new',
+                                                    Navigator.pushNamed(
+                                                        context, '/map-editor',
                                                         arguments: document.id);
                                                   }),
                                                   child: Text(
