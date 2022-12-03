@@ -36,18 +36,18 @@ class _MapObjectEditorWidgetState extends State<MapObjectEditorWidget>
     }
     mapObjectDataModel = newModel;
 
-    widget.onChange(widget.mapObjectModel.copyWith(mapObjectDataModel));
+    widget.onChange(widget.mapObjectModel.copyWith(data: mapObjectDataModel));
     setState(() {});
   }
 
   void rotate(double angle) {
     mapObjectDataModel = mapObjectDataModel.copyWith(angle: angle);
-    widget.onChange(widget.mapObjectModel.copyWith(mapObjectDataModel));
+    widget.onChange(widget.mapObjectModel.copyWith(data: mapObjectDataModel));
     setState(() {});
   }
 
   void onMove() {
-    widget.onChange(widget.mapObjectModel.copyWith(mapObjectDataModel));
+    widget.onChange(widget.mapObjectModel.copyWith(data: mapObjectDataModel));
     setState(() {});
   }
 
@@ -81,7 +81,7 @@ class _MapObjectEditorWidgetState extends State<MapObjectEditorWidget>
           key: stackKey,
           children: [
             MapObjecWidget(
-              widget.mapObjectModel.copyWith(mapObjectDataModel),
+              widget.mapObjectModel.copyWith(data: mapObjectDataModel),
               child: (Widget mapObjectWidget) {
                 return Container(
                   decoration: BoxDecoration(

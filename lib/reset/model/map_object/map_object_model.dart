@@ -21,15 +21,35 @@ class MapObjectModel {
     required this.data,
   });
 
-  copyWith(MapObjectDataModel data) {
+  copyWith({
+    String? id,
+    Color? color,
+    int? order,
+    String? name,
+    String? description,
+    Icon? icon,
+    MapObjectDataModel? data,
+  }) {
     return MapObjectModel(
-      id: id,
-      color: color,
-      order: order,
-      name: name,
-      description: description,
-      icon: icon,
-      data: data,
+      id: id ?? this.id,
+      color: color ?? this.color,
+      order: order ?? this.order,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      icon: icon ?? this.icon,
+      data: data ?? this.data,
     );
   }
+
+  // copyWith(MapObjectDataModel data) {
+  //   return MapObjectModel(
+  //     id: id,
+  //     color: color,
+  //     order: order,
+  //     name: name,
+  //     description: description,
+  //     icon: icon,
+  //     data: data,
+  //   );
+  // }
 }

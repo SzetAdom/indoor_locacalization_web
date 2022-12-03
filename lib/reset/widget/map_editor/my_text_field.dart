@@ -2,20 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class MyTextField extends StatefulWidget {
-  MyTextField({
-    Key? key,
-    required this.title,
-    required this.value,
-    required this.onChanged,
-    this.doubleOnly = false,
-    this.alignment = MainAxisAlignment.end,
-  }) : super(key: key);
+  MyTextField(
+      {Key? key,
+      required this.title,
+      required this.value,
+      required this.onChanged,
+      this.doubleOnly = false,
+      this.alignment = MainAxisAlignment.end,
+      this.isTextArea = false,
+      this.height})
+      : super(key: key);
 
   final String title;
   final String value;
   final Function(String value) onChanged;
-  bool doubleOnly = false;
+  bool doubleOnly;
+  bool isTextArea;
   MainAxisAlignment alignment;
+  double? height;
 
   @override
   State<MyTextField> createState() => _MyTextFieldState();
@@ -36,12 +40,20 @@ class _MyTextFieldState extends State<MyTextField> {
     controller.selection = TextSelection.fromPosition(
         TextPosition(offset: controller.text.length));
     return Container(
+      height: widget.height,
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
           border: Border.all(color: Colors.white)),
       child: TextField(
+          keyboardType: widget.doubleOnly
+              ? const TextInputType.numberWithOptions(decimal: true)
+              : widget.isTextArea
+                  ? TextInputType.multiline
+                  : TextInputType.text,
+          maxLines: widget.isTextArea ? null : 1,
+          expands: widget.isTextArea,
           controller: controller,
           cursorColor: Colors.white,
           enableInteractiveSelection: true,

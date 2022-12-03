@@ -68,7 +68,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Future<QuerySnapshot> loadMaps() async {
+  Future<QuerySnapshot?> loadMaps() async {
+    if (FirebaseAuth.instance.currentUser == null) {
+      return null;
+    }
     final mapsRef = FirebaseFirestore.instance.collection('maps');
     final res = await mapsRef
         .where('user_id', isEqualTo: FirebaseAuth.instance.currentUser?.uid)

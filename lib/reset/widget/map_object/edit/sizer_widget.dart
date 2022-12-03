@@ -120,12 +120,24 @@ class SizerWidget extends StatelessWidget {
     onResize(newMapObjectData);
   }
 
+  _onPanEnd(DragEndDetails details) {
+    var newMapObjectData = mapObjectDataModel;
+    newMapObjectData.x = double.parse(newMapObjectData.x.toStringAsFixed(2));
+    newMapObjectData.y = double.parse(newMapObjectData.y.toStringAsFixed(2));
+    newMapObjectData.width =
+        double.parse(newMapObjectData.width.toStringAsFixed(2));
+    newMapObjectData.height =
+        double.parse(newMapObjectData.height.toStringAsFixed(2));
+    onResize(newMapObjectData);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Positioned.fromRect(
       rect: _getSizer(),
       child: GestureDetector(
         dragStartBehavior: DragStartBehavior.down,
+        onPanEnd: _onPanEnd,
         onPanUpdate: (details) => _panUpdate(
             details,
             baseDragSensitivity *

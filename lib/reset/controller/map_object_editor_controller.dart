@@ -107,5 +107,12 @@ class MapObjectEditorController extends ChangeNotifier {
     }
   }
 
+  void updateSelectedModel(MapObjectModel newModel) {
+    if (selectedIndex != -1) {
+      mapDataModel.objects[selectedIndex] = newModel;
+      notifyListeners();
+    }
+  }
+
   Function? updatePanel;
 }

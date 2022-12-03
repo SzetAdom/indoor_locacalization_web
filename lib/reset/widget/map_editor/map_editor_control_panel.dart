@@ -64,10 +64,9 @@ class _MapEditorControlPanelState extends State<MapEditorControlPanel> {
                         child: MyTextField(
                             doubleOnly: true,
                             title: 'X',
-                            value: controller.selectedMapObject != null
-                                ? controller.selectedMapObject!.data.x
-                                    .toString()
-                                : '',
+                            value: controller.selectedMapObject?.data.x
+                                    .toString() ??
+                                '',
                             onChanged: (String value) {
                               if (controller.selectedMapObject != null) {
                                 var newData = asyncController
@@ -79,13 +78,132 @@ class _MapEditorControlPanelState extends State<MapEditorControlPanel> {
                       ),
                       Flexible(
                         child: MyTextField(
-                            title: 'y',
-                            value: '13',
-                            onChanged: (String value) {}),
+                            doubleOnly: true,
+                            title: 'Y',
+                            value: controller.selectedMapObject?.data.y
+                                    .toString() ??
+                                '',
+                            onChanged: (String value) {
+                              if (controller.selectedMapObject != null) {
+                                var newData = asyncController
+                                    .selectedMapObject!.data
+                                    .copyWith(y: double.parse(value));
+                                asyncController.updateSelectedData(newData);
+                              }
+                            }),
                       ),
                     ],
                   ),
-                )
+                ),
+                SizedBox(
+                  height: 100,
+                  child: Row(
+                    children: [
+                      Flexible(
+                        child: MyTextField(
+                            doubleOnly: true,
+                            title: 'Width',
+                            value: controller.selectedMapObject?.data.width
+                                    .toString() ??
+                                '',
+                            onChanged: (String value) {
+                              if (controller.selectedMapObject != null) {
+                                var newData = asyncController
+                                    .selectedMapObject!.data
+                                    .copyWith(width: double.parse(value));
+                                asyncController.updateSelectedData(newData);
+                              }
+                            }),
+                      ),
+                      Flexible(
+                        child: MyTextField(
+                            doubleOnly: true,
+                            title: 'Height',
+                            value: controller.selectedMapObject?.data.height
+                                    .toString() ??
+                                '',
+                            onChanged: (String value) {
+                              if (controller.selectedMapObject != null) {
+                                var newData = asyncController
+                                    .selectedMapObject!.data
+                                    .copyWith(height: double.parse(value));
+                                asyncController.updateSelectedData(newData);
+                              }
+                            }),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 100,
+                  child: Row(
+                    children: [
+                      Expanded(
+                          child: Slider(
+                        divisions: 24,
+                        min: 0,
+                        max: 360,
+                        label:
+                            '${controller.selectedMapObject?.data.angle ?? 0}°',
+                        inactiveColor: Colors.white,
+                        activeColor: Colors.white,
+                        value: controller.selectedMapObject?.data.angle ?? 0,
+                        onChanged: (value) {
+                          if (controller.selectedMapObject != null) {
+                            var newData = asyncController
+                                .selectedMapObject!.data
+                                .copyWith(angle: value);
+                            asyncController.updateSelectedData(newData);
+                          }
+                        },
+                      ))
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 100,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: MyTextField(
+                            title: 'Name',
+                            value:
+                                controller.selectedMapObject?.name.toString() ??
+                                    '',
+                            onChanged: (String value) {
+                              if (controller.selectedMapObject != null) {
+                                var newModel = asyncController
+                                    .selectedMapObject!
+                                    .copyWith(name: value);
+                                asyncController.updateSelectedModel(newModel);
+                              }
+                            }),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: MyTextField(
+                            height: 300,
+                            title: 'Description',
+                            value: controller.selectedMapObject?.description
+                                    .toString() ??
+                                '',
+                            onChanged: (String value) {
+                              if (controller.selectedMapObject != null) {
+                                var newModel = asyncController
+                                    .selectedMapObject!
+                                    .copyWith(description: value);
+                                asyncController.updateSelectedModel(newModel);
+                              }
+                            }),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             )),
           ),
