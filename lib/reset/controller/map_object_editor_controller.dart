@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/model/map/map_data_model.dart';
 import 'package:indoor_localization_web/reset/model/map_object/map_object_data_model.dart';
@@ -11,39 +12,13 @@ class MapObjectEditorController extends ChangeNotifier {
 
   final MapDataModel mapDataModel = MapDataModel(
     id: '',
+    userId: '',
     name: '',
     description: '',
+    width: 500,
+    height: 500,
     image: '',
-    objects: [
-      MapObjectModel(
-        id: '1',
-        color: Colors.grey,
-        name: 'Object 1',
-        description: 'Object 1 description',
-        icon: const Icon(Icons.ac_unit),
-        data: MapObjectDataModel(
-          x: 100,
-          y: 100,
-          width: 100,
-          height: 100,
-          angle: 30,
-        ),
-      ),
-      MapObjectModel(
-        id: '2',
-        color: Colors.grey,
-        name: 'Object 1',
-        description: 'Object 1 description',
-        icon: const Icon(Icons.ac_unit),
-        data: MapObjectDataModel(
-          x: 200,
-          y: 200,
-          width: 100,
-          height: 100,
-          angle: 30,
-        ),
-      ),
-    ],
+    objects: [],
   );
 
   int selectedIndex = -1;
@@ -55,13 +30,68 @@ class MapObjectEditorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> init() async {
-    try {} catch (e) {
-      log(e.toString());
-      return false;
-    }
+  String? _mapId;
 
-    return true;
+  Future<bool> init(String mapId) async {
+    _mapId = mapId;
+    try {
+      var firestore = FirebaseFirestore.instance;
+      final map = await firestore.collection('maps').doc(mapId).get();
+      if (map.exists) {
+        mapDataModel.id = map.id;
+        mapDataModel.userId = map['user_id'];
+        mapDataModel.name = map['name'];
+        mapDataModel.description = map['description'];
+        mapDataModel.image = '';
+        mapDataModel.objects = [];
+
+        if (map.data()!.containsKey('objects')) {
+          for (final object in map['objects']) {
+            mapDataModel.objects.add(MapObjectModel(
+              color: Colors.grey,
+              name: object['name'],
+              description: object['description'],
+              icon: const Icon(Icons.ac_unit),
+              data: MapObjectDataModel(
+                x: object['x'],
+                y: object['y'],
+                width: object['width'],
+                height: object['height'],
+                angle: object['angle'],
+              ),
+            ));
+          }
+        }
+
+        return true;
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+    return false;
+  }
+
+  Future<void> save() async {
+    var maps = FirebaseFirestore.instance.collection('maps');
+    var newData = mapDataModel.toJson();
+    maps.doc(_mapId).set(newData);
+  }
+
+  void addObject() {
+    mapDataModel.objects.add(MapObjectModel(
+      color: Colors.grey,
+      name: 'New Object',
+      description: 'New Object',
+      icon: const Icon(Icons.ac_unit),
+      data: MapObjectDataModel(
+        x: mapDataModel.width / 2,
+        y: mapDataModel.height / 2,
+        width: 100,
+        height: 100,
+        angle: 0,
+      ),
+    ));
+    notifyListeners();
   }
 
   MapObjectEditorWidget getEditWidget(int index) {

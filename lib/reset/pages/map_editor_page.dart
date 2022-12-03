@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:html';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -10,10 +11,6 @@ import 'package:provider/provider.dart';
 
 class MapEditorPage extends StatefulWidget {
   const MapEditorPage({Key? key}) : super(key: key);
-
-  final double width = 500;
-  final double height = 500;
-
   @override
   State<MapEditorPage> createState() => _MapEditorPageState();
 }
@@ -22,14 +19,15 @@ class _MapEditorPageState extends State<MapEditorPage> {
   Matrix4 matrix = Matrix4.identity();
   ValueNotifier<int> notifier = ValueNotifier(0);
   late MapObjectEditorController controller;
-  late Future future;
+  Future? future;
+
+  String? mapId;
 
   @override
   void initState() {
     // TODO: implement initState
     log('initState');
     controller = MapObjectEditorController();
-    future = controller.init();
     controller.addListener(() {
       setState(() {});
     });
@@ -37,12 +35,51 @@ class _MapEditorPageState extends State<MapEditorPage> {
     super.initState();
   }
 
+  void loadMapId(BuildContext context) {
+    try {
+      mapId ??= (ModalRoute.of(context)?.settings.arguments ?? '') as String;
+      if (mapId != '') {
+        Storage localStorage = window.localStorage;
+        localStorage['mapId'] = mapId!;
+      } else {
+        Storage localStorage = window.localStorage;
+        mapId = localStorage['mapId'];
+      }
+    } catch (e) {
+      log(e.toString());
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    loadMapId(context);
+    future ??= controller.init(mapId!);
     // var _mapObjectController = Provider.of<MapObjectProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 0,
+        actions: [
+IconButton(onPressed: controller.addObject, icon: const Icon(Icons.add)),
+
+          IconButton(
+            onPressed: () {
+              controller.save();
+            },
+            icon: const Icon(Icons.save),
+          ),
+          IconButton(
+            onPressed: () {
+              // controller.undo();
+            },
+            icon: const Icon(Icons.undo),
+          ),
+          IconButton(
+            onPressed: () {
+              // controller.redo();
+            },
+            icon: const Icon(Icons.redo),
+          ),
+        ],
       ),
       body: ChangeNotifierProvider<MapObjectEditorController>(
         create: (context) => controller,
@@ -113,8 +150,8 @@ class _MapEditorPageState extends State<MapEditorPage> {
                                                   maxHeight: double.infinity,
                                                   maxWidth: double.infinity,
                                                   child: Container(
-                                                    width: widget.width,
-                                                    height: widget.height,
+                                                    width: controller.mapDataModel.width,
+                                                    height: controller.mapDataModel.height,
                                                     decoration:
                                                         const BoxDecoration(
                                                       color: Colors.white,

@@ -88,4 +88,11 @@ class MapObjectDataModel {
       angle: angle ?? this.angle,
     );
   }
+
+  MapObjectDataModel.fromJson(Map<String, dynamic> json)
+      : x = json['x'],
+        y = json['y'],
+        width = json['width'],
+        height = json['height'],
+        angle = json['angle'];
 }

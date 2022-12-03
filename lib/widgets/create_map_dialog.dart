@@ -237,7 +237,7 @@ class _CreateMapState extends State<CreateMap> {
                           width: double.maxFinite,
                           child: TextButton(
                             style: TextButton.styleFrom(
-                              primary: Colors.blueGrey.shade800,
+                              foregroundColor: Colors.blueGrey.shade800,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
                               ),
@@ -256,6 +256,7 @@ class _CreateMapState extends State<CreateMap> {
                                       .collection('maps')
                                       .add({
                                     'name': nameController.text,
+                                    'description': '',
                                     'width': int.parse(widthController.text),
                                     'height': int.parse(heightController.text),
                                     'user_id': FirebaseAuth

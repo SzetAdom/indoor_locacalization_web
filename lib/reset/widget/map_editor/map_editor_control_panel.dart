@@ -38,24 +38,6 @@ class _MapEditorControlPanelState extends State<MapEditorControlPanel> {
             child: SingleChildScrollView(
                 child: Column(
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 400.w,
-                      height: 100.h,
-                      color: Colors.blueGrey,
-                      child: const Center(
-                        child: Text(
-                          'Map editor',
-                          style: TextStyle(
-                            fontSize: 30,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
                 SizedBox(
                   height: 100,
                   child: Row(

@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:developer';
-import 'dart:html';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,7 +6,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:indoor_localization_web/firebase_options.dart';
-import 'package:indoor_localization_web/models/map_args.dart';
 import 'package:indoor_localization_web/routes.dart';
 import 'package:indoor_localization_web/utils/authentication.dart';
 import 'package:indoor_localization_web/widgets/auth_dialog.dart';
@@ -82,22 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    _future = loadMaps();
     super.initState();
-  }
-
-  late Future _future;
-
-  void setSelectedMap(String id, String name, double width, double height) {
-    Storage storage = window.localStorage;
-    storage['mapArgs'] = jsonEncode(MapArgs(
-                height: height,
-                width: width,
-                name: name,
-                id: id,
-                userId: FirebaseAuth.instance.currentUser?.uid ?? '')
-            .toJson())
-        .toString();
   }
 
   @override
@@ -147,11 +129,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                 future: loadMaps(),
                                 builder: (context, snapshot) {
                                   log('main page refresh');
+
                                   if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return const Center(child: Text("Loading"));
-                                  }
-                                  if (snapshot.hasData) {
+                                          ConnectionState.done &&
+                                      snapshot.hasData) {
                                     QuerySnapshot querySnapshot =
                                         snapshot.data as QuerySnapshot;
                                     if (querySnapshot.docs.isNotEmpty) {
@@ -172,13 +153,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     top: 20),
                                                 child: TextButton(
                                                   onPressed: (() {
-                                                    setSelectedMap(
-                                                        document.id,
-                                                        data['name'],
-                                                        data['width'],
-                                                        data['height']);
                                                     Navigator.pushNamed(context,
-                                                        '/map-editor-new');
+                                                        '/map-editor-new',
+                                                        arguments: document.id);
                                                   }),
                                                   child: Text(
                                                     'Edit "${data['name']}"',
@@ -192,11 +169,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                             }).toList()),
                                       );
                                     }
-                                    return Container();
+                                  } else if (snapshot.hasError) {
+                                    log(snapshot.error.toString());
+                                    return const Text('Error');
+                                  } else if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const CircularProgressIndicator();
                                   }
-
-                                  return const Center(
-                                      child: Text('Something went wrong'));
+                                  return Container(
+                                      margin: const EdgeInsets.only(top: 30),
+                                      child: const Text('No maps yet'));
                                 })
                           ]),
                     )
