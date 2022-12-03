@@ -1,4 +1,3 @@
-import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -17,7 +16,6 @@ class MapObjectDataModel {
       required this.height,
       required this.angle}) {
     angle = angle % 360;
-    dev.log(angle.toString());
   }
 
   Rect get rect => Rect.fromCenter(

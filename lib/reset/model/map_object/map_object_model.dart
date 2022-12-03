@@ -21,7 +21,7 @@ class MapObjectModel {
     required this.data,
   });
 
-  cloneWith(MapObjectDataModel data) {
+  copyWith(MapObjectDataModel data) {
     return MapObjectModel(
       id: id,
       color: color,

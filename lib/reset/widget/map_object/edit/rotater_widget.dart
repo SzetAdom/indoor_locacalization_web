@@ -1,8 +1,8 @@
-import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:indoor_localization_web/reset/model/map_object/map_object_data_model.dart';
 
 class RotaterWidget extends StatelessWidget {
@@ -59,14 +59,27 @@ class RotaterWidget extends StatelessWidget {
     delta =
         Offset(component * alignmentVector.dx, component * alignmentVector.dy);
 
-    dev.log(delta.toString());
-
     var multiplier = 1;
     if (component < 0) {
       multiplier = -1;
     }
 
-    onRotate(mapObjectDataModel.angle + delta.distance * multiplier);
+    double newAngle = mapObjectDataModel.angle + delta.distance * multiplier;
+
+    if (RawKeyboard.instance.keysPressed
+        .contains(LogicalKeyboardKey.controlLeft)) {
+      if (newAngle > 0) {
+        newAngle = (newAngle / 45).ceil() * 45;
+      } else {
+        newAngle = (newAngle / 45).floor() * 45;
+      }
+    }
+
+    onRotate(newAngle);
+  }
+
+  void setToHorizontal() {
+    onRotate(0);
   }
 
   @override
@@ -74,6 +87,7 @@ class RotaterWidget extends StatelessWidget {
     return Positioned.fromRect(
       rect: getRotator(),
       child: GestureDetector(
+        onDoubleTap: setToHorizontal,
         dragStartBehavior: DragStartBehavior.down,
         onPanUpdate: _panUpdate,
         child: Container(

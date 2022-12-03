@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:indoor_localization_web/firebase_options.dart';
 import 'package:indoor_localization_web/models/map_args.dart';
 import 'package:indoor_localization_web/routes.dart';
@@ -42,14 +43,19 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Beacon map',
-      theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
-      ),
-      home: const MyHomePage(),
-      routes: appRoutes,
-      debugShowCheckedModeBanner: false,
+    return ScreenUtilInit(
+      designSize: const Size(1920, 1080),
+      builder: (context, child) {
+        return MaterialApp(
+          title: 'Beacon map',
+          theme: ThemeData(
+            primarySwatch: Colors.blueGrey,
+          ),
+          home: const MyHomePage(),
+          routes: appRoutes,
+          debugShowCheckedModeBanner: false,
+        );
+      },
     );
   }
 }

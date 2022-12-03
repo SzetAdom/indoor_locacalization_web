@@ -23,11 +23,6 @@ class _MapEditorState extends State<MapEditor> {
   @override
   void initState() {
     super.initState();
-    // WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-    //   // setState(() {
-    //   //   _doneBuilding = true;
-    //   // });
-    // });
   }
 
   Matrix4 matrix = Matrix4.identity();
@@ -82,11 +77,9 @@ class _MapEditorState extends State<MapEditor> {
                                     color: Colors.grey.shade200,
                                     child: GridPaper(
                                       color: Colors.black,
-                                      
                                       child: Stack(
                                         alignment: Alignment.center,
                                         children: [
-                                          // if (_doneBuilding)
                                           ...mapObjectController.objects
                                         ],
                                       ),

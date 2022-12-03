@@ -1,10 +1,10 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:indoor_localization_web/reset/widget/map_object/edit/map_object_editor_widget.dart';
 import 'package:indoor_localization_web/reset/model/map/map_data_model.dart';
 import 'package:indoor_localization_web/reset/model/map_object/map_object_data_model.dart';
 import 'package:indoor_localization_web/reset/model/map_object/map_object_model.dart';
+import 'package:indoor_localization_web/reset/widget/map_object/edit/map_object_editor_widget.dart';
 
 class MapObjectEditorController extends ChangeNotifier {
   MapObjectEditorController();
@@ -48,6 +48,13 @@ class MapObjectEditorController extends ChangeNotifier {
 
   int selectedIndex = -1;
 
+  double scale = 1;
+
+  changeScale(double newScale) {
+    scale = newScale;
+    notifyListeners();
+  }
+
   Future<bool> init() async {
     try {} catch (e) {
       log(e.toString());
@@ -55,6 +62,20 @@ class MapObjectEditorController extends ChangeNotifier {
     }
 
     return true;
+  }
+
+  MapObjectEditorWidget getEditWidget(int index) {
+    return MapObjectEditorWidget(
+      mapDataModel.objects[index],
+      selectedCallback: (bool selected) {
+        selectObject(index, selected);
+      },
+      onChange: (newModel) {
+        updateSelected(newModel);
+        updatePanel?.call();
+      },
+      selected: selectedIndex == index,
+    );
   }
 
   bool get mapSelected => selectedIndex == -1;
@@ -65,14 +86,26 @@ class MapObjectEditorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  MapObjectEditorWidget getEditWidget(int index) {
-    return MapObjectEditorWidget(
-      mapDataModel.objects[index],
-      selectedCallback: (bool selected) {
-        selectObject(index, selected);
-      },
-      saveCallback: (mapObjectModel) async {},
-      selected: selectedIndex == index,
-    );
+  MapObjectModel? get selectedMapObject =>
+      selectedIndex == -1 ? null : mapDataModel.objects[selectedIndex];
+
+  notify() {
+    notifyListeners();
   }
+
+  void updateSelected(MapObjectModel mapObjectModel) {
+    if (selectedIndex != -1) {
+      mapDataModel.objects[selectedIndex] = mapObjectModel;
+      notifyListeners();
+    }
+  }
+
+  void updateSelectedData(MapObjectDataModel newModel) {
+    if (selectedIndex != -1) {
+      mapDataModel.objects[selectedIndex].data = newModel;
+      notifyListeners();
+    }
+  }
+
+  Function? updatePanel;
 }

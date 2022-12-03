@@ -2,7 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:indoor_localization_web/reset/controller/map_object_editor_controller.dart';
 import 'package:indoor_localization_web/reset/model/map_object/map_object_data_model.dart';
+import 'package:provider/provider.dart';
 
 class SizerWidget extends StatelessWidget {
   const SizerWidget(
@@ -25,8 +27,8 @@ class SizerWidget extends StatelessWidget {
   /// The callback function when the sizer is resized
   final Function(MapObjectDataModel mapObjectDataModel) onResize;
 
-  /// The sensitivity of the drag
-  final double dragSensitivity = 2.2;
+  /// The base sensitivity of the drag, it will be muliptlied by the zoom scale
+  final double baseDragSensitivity = 2.2;
 
   /// Rotate a point (helper function)
   Offset _rotate({required double x, required double y, required angle}) {
@@ -76,7 +78,7 @@ class SizerWidget extends StatelessWidget {
   }
 
   /// Resize the map object when the sizer is dragged
-  _panUpdate(DragUpdateDetails details) {
+  _panUpdate(DragUpdateDetails details, double dragSensitivity) {
     ///Vector of the drag gesture in the local coordinate system
     var delta = details.delta;
 
@@ -124,7 +126,11 @@ class SizerWidget extends StatelessWidget {
       rect: _getSizer(),
       child: GestureDetector(
         dragStartBehavior: DragStartBehavior.down,
-        onPanUpdate: _panUpdate,
+        onPanUpdate: (details) => _panUpdate(
+            details,
+            baseDragSensitivity *
+                Provider.of<MapObjectEditorController>(context, listen: false)
+                    .scale),
         child: Container(
           decoration:
               const ShapeDecoration(shape: CircleBorder(), color: Colors.blue),
