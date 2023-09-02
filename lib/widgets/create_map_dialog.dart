@@ -12,14 +12,17 @@ class CreateMap extends StatefulWidget {
 
 class _CreateMapState extends State<CreateMap> {
   bool editingName = false;
+  bool editingDescription = false;
   bool editingWidth = false;
   bool editingHeight = false;
 
   FocusNode nameFocusNode = FocusNode();
+  FocusNode descriptionFocusNode = FocusNode();
   FocusNode widthFocusNode = FocusNode();
   FocusNode heightFocusNode = FocusNode();
 
   late TextEditingController nameController = TextEditingController();
+  late TextEditingController descriptionController = TextEditingController();
   late TextEditingController widthController = TextEditingController();
   late TextEditingController heightController = TextEditingController();
 
@@ -68,6 +71,7 @@ class _CreateMapState extends State<CreateMap> {
   @override
   void initState() {
     nameController = TextEditingController(text: 'New map');
+    descriptionController = TextEditingController(text: '');
     widthController = TextEditingController(text: '500');
     heightController = TextEditingController(text: '500');
     super.initState();
@@ -76,6 +80,7 @@ class _CreateMapState extends State<CreateMap> {
   @override
   void dispose() {
     nameController.dispose();
+    descriptionController.dispose();
     widthController.dispose();
     heightController.dispose();
     super.dispose();
@@ -107,7 +112,7 @@ class _CreateMapState extends State<CreateMap> {
                   },
                   onSubmitted: (value) {
                     nameFocusNode.unfocus();
-                    FocusScope.of(context).requestFocus(widthFocusNode);
+                    FocusScope.of(context).requestFocus(descriptionFocusNode);
                   },
                   style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
@@ -130,6 +135,39 @@ class _CreateMapState extends State<CreateMap> {
                       fontSize: 12,
                       color: Colors.redAccent,
                     ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  focusNode: descriptionFocusNode,
+                  keyboardType: TextInputType.text,
+                  textInputAction: TextInputAction.next,
+                  controller: descriptionController,
+                  autofocus: false,
+                  onChanged: (value) {
+                    setState(() {
+                      editingDescription = true;
+                    });
+                  },
+                  onSubmitted: (value) {
+                    descriptionFocusNode.unfocus();
+                    FocusScope.of(context).requestFocus(widthFocusNode);
+                  },
+                  style: const TextStyle(color: Colors.black),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Colors.blueGrey[800]!,
+                        width: 3,
+                      ),
+                    ),
+                    filled: true,
+                    hintStyle: TextStyle(
+                      color: Colors.blueGrey[300],
+                    ),
+                    hintText: "Description",
+                    fillColor: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -252,7 +290,7 @@ class _CreateMapState extends State<CreateMap> {
                                       .collection('maps')
                                       .add({
                                     'name': nameController.text,
-                                    'description': '',
+                                    'description': descriptionController.text,
                                     'width': int.parse(widthController.text),
                                     'height': int.parse(heightController.text),
                                     'user_id': FirebaseAuth

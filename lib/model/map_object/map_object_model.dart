@@ -6,7 +6,6 @@ class MapObjectModel {
   int order;
   String name;
   String description;
-  Icon? icon;
 
   MapObjectDataModel data;
 
@@ -15,7 +14,6 @@ class MapObjectModel {
     this.order = 0,
     required this.name,
     required this.description,
-    required this.icon,
     required this.data,
   });
 
@@ -33,7 +31,6 @@ class MapObjectModel {
       order: order ?? this.order,
       name: name ?? this.name,
       description: description ?? this.description,
-      icon: icon ?? this.icon,
       data: data ?? this.data,
     );
   }
@@ -43,7 +40,6 @@ class MapObjectModel {
         order = json['order'],
         name = json['name'],
         description = json['description'],
-        icon = Icon(IconData(json['icon'], fontFamily: 'MaterialIcons')),
         data = MapObjectDataModel.fromJson(json['data']);
 
   Map<String, dynamic> toJson() {

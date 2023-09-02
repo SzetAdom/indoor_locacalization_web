@@ -41,6 +41,8 @@ class MapObjectEditorController extends ChangeNotifier {
         mapDataModel.id = map.id;
         mapDataModel.userId = map['user_id'];
         mapDataModel.name = map['name'];
+        mapDataModel.width = map['width'];
+        mapDataModel.height = map['height'];
         mapDataModel.description = map['description'];
         mapDataModel.image = '';
         mapDataModel.objects = [];
@@ -51,7 +53,7 @@ class MapObjectEditorController extends ChangeNotifier {
               color: Colors.grey,
               name: object['name'],
               description: object['description'],
-              icon: const Icon(Icons.ac_unit),
+  
               data: MapObjectDataModel(
                 x: object['x'],
                 y: object['y'],
@@ -82,7 +84,6 @@ class MapObjectEditorController extends ChangeNotifier {
       color: Colors.grey,
       name: 'New Object',
       description: 'New Object',
-      icon: const Icon(Icons.ac_unit),
       data: MapObjectDataModel(
         x: mapDataModel.width / 2,
         y: mapDataModel.height / 2,
@@ -91,6 +92,11 @@ class MapObjectEditorController extends ChangeNotifier {
         angle: 0,
       ),
     ));
+    notifyListeners();
+  }
+
+  void deleteSelected() {
+    mapDataModel.objects.removeAt(selectedIndex);
     notifyListeners();
   }
 

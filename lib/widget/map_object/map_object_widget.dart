@@ -22,9 +22,6 @@ class MapObjecWidget extends StatelessWidget {
         angle: withoutRotation ? 0 : mapObjectModel.data.angleInRadiant,
         child: child.call(Container(
           color: withoutRotation ? Colors.red : mapObjectModel.color,
-          child: Center(
-            child: mapObjectModel.icon,
-          ),
         )),
       ),
     );

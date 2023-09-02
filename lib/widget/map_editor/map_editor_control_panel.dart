@@ -186,6 +186,24 @@ class _MapEditorControlPanelState extends State<MapEditorControlPanel> {
                     ],
                   ),
                 ),
+                if (controller.selectedIndex != -1)
+                  GestureDetector(
+                    onTap: () {
+                      asyncController.deleteSelected();
+                    },
+                    child: Container(
+                      width: 150,
+                      height: 30,
+                      margin: const EdgeInsets.all(10),
+                      color: Colors.red,
+                      child: const Center(
+                        child: Text(
+                          'Delete',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             )),
           ),
