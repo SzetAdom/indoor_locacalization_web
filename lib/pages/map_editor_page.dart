@@ -10,15 +10,15 @@ import 'package:indoor_localization_web/widgets/object_list_widget.dart';
 import 'package:matrix_gesture_detector/matrix_gesture_detector.dart';
 import 'package:provider/provider.dart';
 
-class MapEditorPage extends StatefulWidget {
-  const MapEditorPage({required this.mapId, Key? key}) : super(key: key);
+class MapEditorPageOld extends StatefulWidget {
+  const MapEditorPageOld({required this.mapId, Key? key}) : super(key: key);
   @override
-  State<MapEditorPage> createState() => _MapEditorPageState();
+  State<MapEditorPageOld> createState() => _MapEditorPageOldState();
 
   final String mapId;
 }
 
-class _MapEditorPageState extends State<MapEditorPage> {
+class _MapEditorPageOldState extends State<MapEditorPageOld> {
   Matrix4 matrix = Matrix4.identity();
   ValueNotifier<int> notifier = ValueNotifier(0);
   late MapObjectEditorController controller;

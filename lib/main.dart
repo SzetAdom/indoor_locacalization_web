@@ -56,9 +56,7 @@ class _MyAppState extends State<MyApp> {
       ),
       title: 'Beacon map',
       theme: ThemeData.from(
-          useMaterial3: true,
-          colorScheme: const ColorScheme.light(),
-          textTheme: const TextTheme()),
+          colorScheme: const ColorScheme.light(), useMaterial3: true),
       routerConfig: router,
       debugShowCheckedModeBanner: false,
     );
@@ -90,9 +88,10 @@ class _MyHomePageResetState extends State<MyHomePageReset> {
               margin: const EdgeInsets.only(top: 20),
               child: TextButton(
                 onPressed: (() {
-                  showDialog(
-                      context: context,
-                      builder: (context) => const CreateMap());
+                  context.go('/map-editor/id');
+                  // showDialog(
+                  //     context: context,
+                  //     builder: (context) => const CrateMapPopUpWidget());
                 }),
                 child: const Text(
                   'Create new map',

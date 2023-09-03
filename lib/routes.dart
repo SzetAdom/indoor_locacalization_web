@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:indoor_localization_web/main.dart';
 import 'package:indoor_localization_web/pages/erro_page.dart';
-import 'package:indoor_localization_web/pages/map_editor_page.dart';
+import 'package:indoor_localization_web/reset/map_editor_page.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 final GoRouter router = GoRouter(

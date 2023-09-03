@@ -53,7 +53,6 @@ class MapObjectEditorController extends ChangeNotifier {
               color: Colors.grey,
               name: object['name'],
               description: object['description'],
-  
               data: MapObjectDataModel(
                 x: object['x'],
                 y: object['y'],
