@@ -4,7 +4,6 @@ import 'dart:html';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:indoor_localization_web/controller/map_object_editor_controller.dart';
 import 'package:indoor_localization_web/widget/map_editor/map_editor_control_panel.dart';
 import 'package:indoor_localization_web/widgets/object_list_widget.dart';
@@ -12,9 +11,11 @@ import 'package:matrix_gesture_detector/matrix_gesture_detector.dart';
 import 'package:provider/provider.dart';
 
 class MapEditorPage extends StatefulWidget {
-  const MapEditorPage({Key? key}) : super(key: key);
+  const MapEditorPage({required this.mapId, Key? key}) : super(key: key);
   @override
   State<MapEditorPage> createState() => _MapEditorPageState();
+
+  final String mapId;
 }
 
 class _MapEditorPageState extends State<MapEditorPage> {
@@ -197,7 +198,7 @@ class _MapEditorPageState extends State<MapEditorPage> {
                         ),
                       ),
                       Container(
-                        width: 300.w,
+                        width: 300,
                         color: Colors.blueGrey,
                         child: Column(children: [
                           const SizedBox(

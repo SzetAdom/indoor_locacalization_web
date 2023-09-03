@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:indoor_localization_web/controller/map_object_editor_controller.dart';
 import 'package:indoor_localization_web/widget/map_editor/my_text_field.dart';
 import 'package:provider/provider.dart';
@@ -34,7 +33,7 @@ class _MapEditorControlPanelState extends State<MapEditorControlPanel> {
         Expanded(
           child: Container(
             color: Colors.blueGrey,
-            width: 400.w,
+            width: 400,
             child: SingleChildScrollView(
                 child: Column(
               children: [

@@ -4,17 +4,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:indoor_localization_web/firebase_options.dart';
 import 'package:indoor_localization_web/routes.dart';
 import 'package:indoor_localization_web/utils/authentication.dart';
 import 'package:indoor_localization_web/widgets/auth_dialog.dart';
 import 'package:indoor_localization_web/widgets/create_map_dialog.dart';
+import 'package:responsive_framework/breakpoint.dart';
+import 'package:responsive_framework/responsive_breakpoints.dart';
+import 'package:url_strategy/url_strategy.dart';
 
 void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  setPathUrlStrategy();
   runApp(const MyApp());
 }
 
@@ -40,19 +44,82 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(1920, 1080),
-      builder: (context, child) {
-        return MaterialApp(
-          title: 'Beacon map',
-          theme: ThemeData(
-            primarySwatch: Colors.blueGrey,
-          ),
-          home: const MyHomePage(),
-          routes: appRoutes,
-          debugShowCheckedModeBanner: false,
-        );
-      },
+    return MaterialApp.router(
+      builder: (context, child) => ResponsiveBreakpoints.builder(
+        child: child!,
+        breakpoints: [
+          const Breakpoint(start: 0, end: 450, name: MOBILE),
+          const Breakpoint(start: 451, end: 800, name: TABLET),
+          const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+          const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+        ],
+      ),
+      title: 'Beacon map',
+      theme: ThemeData.from(
+          useMaterial3: true,
+          colorScheme: const ColorScheme.light(),
+          textTheme: const TextTheme()),
+      routerConfig: router,
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class MyHomePageReset extends StatefulWidget {
+  const MyHomePageReset({Key? key}) : super(key: key);
+
+  @override
+  State<MyHomePageReset> createState() => _MyHomePageResetState();
+}
+
+class _MyHomePageResetState extends State<MyHomePageReset> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Home'),
+      ),
+      body: Container(
+        alignment: Alignment.center,
+        child: Column(
+          children: [
+            Container(
+              width: 200,
+              height: 50,
+              color: Theme.of(context).primaryColor,
+              margin: const EdgeInsets.only(top: 20),
+              child: TextButton(
+                onPressed: (() {
+                  showDialog(
+                      context: context,
+                      builder: (context) => const CreateMap());
+                }),
+                child: const Text(
+                  'Create new map',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+              ),
+            ),
+            Container(
+              width: 200,
+              height: 50,
+              color: Theme.of(context).primaryColor,
+              margin: const EdgeInsets.only(top: 20),
+              child: TextButton(
+                onPressed: (() {
+                  context.go('/map-editor');
+                }),
+                child: const Text(
+                  'Edit map',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -153,9 +220,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     top: 20),
                                                 child: TextButton(
                                                   onPressed: (() {
-                                                    Navigator.pushNamed(
-                                                        context, '/map-editor',
-                                                        arguments: document.id);
+                                                    context.go('/map-editor');
                                                   }),
                                                   child: Text(
                                                     'Edit "${data['name']}"',
