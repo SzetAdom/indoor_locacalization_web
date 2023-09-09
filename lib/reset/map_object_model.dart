@@ -7,7 +7,6 @@ class MapObjectModel {
   String? icon;
   String? description;
   List<MapPointModel> points;
-  
 
   MapObjectModel({
     required this.id,
@@ -30,6 +29,5 @@ class MapObjectModel {
           .toList(),
     );
   }
-
-
+  
 }

@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 
 class MapPointModel {
   final String id;
-  final String? name;
-  final Color? color;
-  final double? x;
-  final double? y;
-  final String description;
-  final String? icon;
+  String? name;
+  Color? color;
+  double x;
+  double y;
+  String description;
+  String? icon;
 
   MapPointModel({
     required this.id,
     this.name,
     this.color,
-    this.x,
-    this.y,
+    required this.x,
+    required this.y,
     required this.description,
     this.icon,
   });
@@ -28,6 +28,13 @@ class MapPointModel {
       y: json['y'],
       description: json['description'],
       icon: json['icon'],
+    );
+  }
+
+  Offset toOffset() {
+    return Offset(
+      x,
+      y,
     );
   }
 }
