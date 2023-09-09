@@ -8,8 +8,11 @@ class MapEditorPainter extends CustomPainter {
 
   String? selectedPointId;
 
+  Offset mapOffset;
+
   MapEditorPainter({
     required this.points,
+    required this.mapOffset,
     this.selectedPointId,
   });
 
@@ -38,8 +41,9 @@ class MapEditorPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // drawMapBackground(canvas, size);
-    // canvas.translate(size.width / 2, size.height / 2);
+    drawMapBackground(canvas, size);
+    canvas.translate(mapOffset.dx, mapOffset.dy);
+    canvas.translate(size.width / 2, size.height / 2);
     for (final point in points) {
       _drawPoint(canvas, point.toOffset(), point.id == selectedPointId);
     }

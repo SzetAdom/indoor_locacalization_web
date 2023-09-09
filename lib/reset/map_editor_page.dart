@@ -66,59 +66,66 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
                     );
                   }
 
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Row(
-                          children: [
-                            // const MapEditorControlPanel(),
-                            Expanded(
-                              child: Container(
-                                color: Colors.grey[500],
-                                child: GestureDetector(
-                                  onTapDown: (details) =>
-                                      controller.onTap(details.localPosition),
-                                  onPanStart: (details) => controller
-                                      .onPanStart(details.localPosition),
-                                  onPanUpdate: (details) => controller
-                                      .onPanUpdate(details.localPosition),
-                                  onPanEnd: (details) => controller.onPanEnd(),
+                  return Container(
+                    color: Colors.blueGrey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // const MapEditorControlPanel(),
+                              GestureDetector(
+                                onTapDown: (details) =>
+                                    controller.onTap(details.localPosition),
+                                onPanStart: (details) => controller
+                                    .onPanStart(details.localPosition),
+                                onPanUpdate: (details) =>
+                                    controller.onPanUpdate(details),
+                                onPanEnd: (details) => controller.onPanEnd(),
+                                child: ClipRect(
+                                  clipBehavior: Clip.hardEdge,
                                   child: ConstrainedBox(
-                                    constraints: const BoxConstraints.expand(),
+                                    constraints: BoxConstraints(
+                                      minWidth: controller.map.width,
+                                      minHeight: controller.map.height,
+                                    ),
                                     child: CustomPaint(
                                       painter: MapEditorPainter(
-                                          points: controller.map.points,
-                                          selectedPointId:
-                                              controller.selectedPointId),
+                                        points: controller.map.points,
+                                        selectedPointId:
+                                            controller.selectedPointId,
+                                        mapOffset: controller.mapOffset,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            // Container(
-                            //   width: 300,
-                            //   color: Colors.blueGrey,
-                            //   child: Column(children: [
-                            //     const SizedBox(
-                            //         height: 400, child: ObjectListWidget()),
-                            //     GestureDetector(
-                            //       child: Container(
-                            //           child: const Text(
-                            //         'Add object',
-                            //         style: TextStyle(color: Colors.white),
-                            //       )),
-                            //     ),
-                            //     IconButton(
-                            //         color: Colors.white,
-                            //         onPressed: () {},
-                            //         icon: const Icon(Icons.add)),
-                            //   ]),
-                            // )
-                          ],
+                              // Container(
+                              //   width: 300,
+                              //   color: Colors.blueGrey,
+                              //   child: Column(children: [
+                              //     const SizedBox(
+                              //         height: 400, child: ObjectListWidget()),
+                              //     GestureDetector(
+                              //       child: Container(
+                              //           child: const Text(
+                              //         'Add object',
+                              //         style: TextStyle(color: Colors.white),
+                              //       )),
+                              //     ),
+                              //     IconButton(
+                              //         color: Colors.white,
+                              //         onPressed: () {},
+                              //         icon: const Icon(Icons.add)),
+                              //   ]),
+                              // )
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   );
                 } else {
                   return const Center(

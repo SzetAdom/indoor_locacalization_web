@@ -34,13 +34,17 @@ class MapEditorController extends ChangeNotifier {
     dev.log("${offset.dx} ${offset.dy}");
 
     map.points.sort((a, b) {
-      final distanceA = (a.toOffset() - offset).distanceSquared;
-      final distanceB = (b.toOffset() - offset).distanceSquared;
+      final distanceA = (a.toTranslatedOffset(map.width, map.height) - offset)
+          .distanceSquared;
+      final distanceB = (b.toTranslatedOffset(map.width, map.height) - offset)
+          .distanceSquared;
       return distanceA.compareTo(distanceB);
     });
 
     final nearestPoint = map.points.first;
-    var distance = (nearestPoint.toOffset() - offset).distance;
+    var distance =
+        (nearestPoint.toTranslatedOffset(map.width, map.height) - offset)
+            .distance;
     if (distance < 10) {
       selectedPointId = nearestPoint.id;
     } else {
@@ -53,12 +57,15 @@ class MapEditorController extends ChangeNotifier {
     onTap(offset);
   }
 
-  void onPanUpdate(Offset offset) {
+  void onPanUpdate(DragUpdateDetails offset) {
     if (selectedPointId != null) {
       var selectedPoint =
           map.points.firstWhere((element) => element.id == selectedPointId);
-      selectedPoint.x = offset.dx;
-      selectedPoint.y = offset.dy;
+      selectedPoint.x = translateToMap(offset.localPosition).dx;
+      selectedPoint.y = translateToMap(offset.localPosition).dy;
+      notifyListeners();
+    } else {
+      mapOffset += offset.delta;
       notifyListeners();
     }
   }
@@ -67,6 +74,12 @@ class MapEditorController extends ChangeNotifier {
     selectedPointId = null;
     notifyListeners();
   }
+
+  Offset translateToMap(Offset offset) {
+    return offset.translate(-map.width / 2, -map.height / 2);
+  }
+
+  Offset mapOffset = Offset.zero;
 
   String? selectedPointId;
 }

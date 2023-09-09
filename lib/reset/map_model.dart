@@ -26,14 +26,16 @@ class MapModel {
     );
   }
 
-  double width = 500;
-  double height = 500;
+  double baseWidth = 500;
+  double baseHeight = 500;
 
   double widthRigth;
   double widthLeft;
   double heightTop;
   double heightBottom;
 
+  double get width => baseWidth + widthRigth + widthLeft;
+  double get height => baseHeight + heightTop + heightBottom;
 
   //starting point
   //list of objects
