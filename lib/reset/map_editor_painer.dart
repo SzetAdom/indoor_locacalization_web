@@ -9,10 +9,12 @@ class MapEditorPainter extends CustomPainter {
   String? selectedPointId;
 
   Offset mapOffset;
+  Size mapSize;
 
   MapEditorPainter({
     required this.points,
     required this.mapOffset,
+    required this.mapSize,
     this.selectedPointId,
   });
 
@@ -30,20 +32,37 @@ class MapEditorPainter extends CustomPainter {
     canvas.drawPoints(PointMode.points, [point], paint);
   }
 
-  void drawMapBackground(Canvas canvas, Size size) {
+  void drawBaseBackground(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white
+      ..color = Colors.grey
       ..strokeWidth = 10
       ..strokeCap = StrokeCap.round;
 
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), paint);
   }
 
+  void drawMapBackground(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 10
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawRect(Rect.fromLTWH(0, 0, mapSize.width, mapSize.height), paint);
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
-    drawMapBackground(canvas, size);
+    drawBaseBackground(canvas, size);
+
+    var horizontalOffset = (size.width / 2) - (mapSize.width / 2);
+    var verticalOffset = (size.height / 2) - (mapSize.height / 2);
+    canvas.translate(
+      horizontalOffset,
+      verticalOffset,
+    );
     canvas.translate(mapOffset.dx, mapOffset.dy);
-    canvas.translate(size.width / 2, size.height / 2);
+    drawMapBackground(canvas, size);
+    canvas.translate(mapSize.width / 2, mapSize.height / 2);
     for (final point in points) {
       _drawPoint(canvas, point.toOffset(), point.id == selectedPointId);
     }

@@ -31,20 +31,18 @@ class MapEditorController extends ChangeNotifier {
   void onTap(Offset offset) {
     //select nearest point
 
-    dev.log("${offset.dx} ${offset.dy}");
+    var normalizedOffset = normalize(offset);
+
+    dev.log("${normalizedOffset.dx} ${normalizedOffset.dy}");
 
     map.points.sort((a, b) {
-      final distanceA = (a.toTranslatedOffset(map.width, map.height) - offset)
-          .distanceSquared;
-      final distanceB = (b.toTranslatedOffset(map.width, map.height) - offset)
-          .distanceSquared;
+      final distanceA = (a.toOffset() - normalizedOffset).distance;
+      final distanceB = (b.toOffset() - normalizedOffset).distance;
       return distanceA.compareTo(distanceB);
     });
 
     final nearestPoint = map.points.first;
-    var distance =
-        (nearestPoint.toTranslatedOffset(map.width, map.height) - offset)
-            .distance;
+    var distance = (nearestPoint.toOffset() - normalizedOffset).distance;
     if (distance < 10) {
       selectedPointId = nearestPoint.id;
     } else {
@@ -58,11 +56,13 @@ class MapEditorController extends ChangeNotifier {
   }
 
   void onPanUpdate(DragUpdateDetails offset) {
+    var normalizedOffset = normalize(offset.localPosition);
+
     if (selectedPointId != null) {
       var selectedPoint =
           map.points.firstWhere((element) => element.id == selectedPointId);
-      selectedPoint.x = translateToMap(offset.localPosition).dx;
-      selectedPoint.y = translateToMap(offset.localPosition).dy;
+      selectedPoint.x = normalizedOffset.dx;
+      selectedPoint.y = normalizedOffset.dy;
       notifyListeners();
     } else {
       mapOffset += offset.delta;
@@ -71,15 +71,33 @@ class MapEditorController extends ChangeNotifier {
   }
 
   void onPanEnd() {
-    selectedPointId = null;
-    notifyListeners();
+    if (selectedPointId != null) {
+
+
+      
+      selectedPointId = null;
+      notifyListeners();
+    }
   }
 
-  Offset translateToMap(Offset offset) {
-    return offset.translate(-map.width / 2, -map.height / 2);
+  Offset normalize(Offset offset) {
+    return translateToMapOffset(translateFromCanvas(offset));
+  }
+
+  Offset translateFromCanvas(Offset offset) {
+    var horizontalOffset = (canvasSize.width / 2);
+    var verticalOffset = (canvasSize.height / 2);
+
+    return offset.translate(-1 * horizontalOffset, -1 * verticalOffset);
+  }
+
+  Offset translateToMapOffset(Offset offset) {
+    return offset.translate(-mapOffset.dx, -mapOffset.dy);
   }
 
   Offset mapOffset = Offset.zero;
 
   String? selectedPointId;
+
+  Size canvasSize = Size.zero;
 }

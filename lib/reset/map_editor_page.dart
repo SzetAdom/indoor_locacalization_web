@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:indoor_localization_web/reset/map_editor_background_painter.dart';
 import 'package:indoor_localization_web/reset/map_editor_controller.dart';
 import 'package:indoor_localization_web/reset/map_editor_painer.dart';
 import 'package:provider/provider.dart';
@@ -69,34 +70,69 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
                   return Container(
                     color: Colors.blueGrey,
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Expanded(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               // const MapEditorControlPanel(),
-                              GestureDetector(
-                                onTapDown: (details) =>
-                                    controller.onTap(details.localPosition),
-                                onPanStart: (details) => controller
-                                    .onPanStart(details.localPosition),
-                                onPanUpdate: (details) =>
-                                    controller.onPanUpdate(details),
-                                onPanEnd: (details) => controller.onPanEnd(),
-                                child: ClipRect(
-                                  clipBehavior: Clip.hardEdge,
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      minWidth: controller.map.width,
-                                      minHeight: controller.map.height,
-                                    ),
-                                    child: CustomPaint(
-                                      painter: MapEditorPainter(
-                                        points: controller.map.points,
-                                        selectedPointId:
-                                            controller.selectedPointId,
-                                        mapOffset: controller.mapOffset,
+                              Expanded(
+                                child: Container(
+                                  height: MediaQuery.of(context).size.height,
+                                  color: Colors.grey,
+                                  child: GestureDetector(
+                                    onTapDown: (details) =>
+                                        controller.onTap(details.localPosition),
+                                    onPanStart: (details) => controller
+                                        .onPanStart(details.localPosition),
+                                    onPanUpdate: (details) =>
+                                        controller.onPanUpdate(details),
+                                    onPanEnd: (details) =>
+                                        controller.onPanEnd(),
+                                    child: ClipRect(
+                                      clipBehavior: Clip.hardEdge,
+                                      child: ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          maxWidth: controller.map.width,
+                                          maxHeight: controller.map.height,
+                                        ),
+                                        child: ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            minWidth: controller.map.width,
+                                            minHeight: controller.map.height,
+                                          ),
+                                          child: CustomPaint(
+                                            painter:
+                                                MapEditorBackgroundPainter(),
+                                            child: ConstrainedBox(
+                                                constraints: BoxConstraints(
+                                                  minWidth:
+                                                      controller.map.width,
+                                                  minHeight:
+                                                      controller.map.height,
+                                                ),
+                                                child: LayoutBuilder(builder:
+                                                    (context, constrains) {
+                                                  controller.canvasSize =
+                                                      constrains.biggest;
+                                                  return CustomPaint(
+                                                    painter: MapEditorPainter(
+                                                      points:
+                                                          controller.map.points,
+                                                      selectedPointId:
+                                                          controller
+                                                              .selectedPointId,
+                                                      mapSize: Size(
+                                                          controller.map.width,
+                                                          controller
+                                                              .map.height),
+                                                      mapOffset:
+                                                          controller.mapOffset,
+                                                    ),
+                                                  );
+                                                })),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
