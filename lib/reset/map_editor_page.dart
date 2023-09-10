@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:indoor_localization_web/reset/map_editor_controller.dart';
 import 'package:indoor_localization_web/reset/map_editor_painer.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +26,26 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
     super.initState();
     controller = MapEditorController();
     future = controller.loadMap(widget.mapId);
+    ServicesBinding.instance.keyboard.addHandler(_onKey);
+  }
+
+  bool _onKey(KeyEvent event) {
+    final key = event.logicalKey.keyLabel;
+
+    if (event is KeyDownEvent) {
+      if (key == 'Shift Left') {
+        controller.selectMap(true);
+      } else if (key == 'Control Left') {
+        controller.setSnapToGrid(true);
+      }
+    } else if (event is KeyUpEvent) {
+      if (key == 'Shift Left') {
+        controller.selectMap(false);
+      } else if (key == 'Control Left') {
+        controller.setSnapToGrid(false);
+      }
+    }
+    return false;
   }
 
   @override
@@ -106,12 +127,19 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
                                                 constrains.biggest;
                                             return CustomPaint(
                                               painter: MapEditorPainter(
-                                                map: controller.map,
-                                                selectedPointId:
-                                                    controller.selectedPointId,
-                                                canvasOffset:
-                                                    controller.canvasOffset,
-                                              ),
+                                                  map: controller.map,
+                                                  selectedPointId: controller
+                                                      .selectedPointId,
+                                                  canvasOffset:
+                                                      controller.canvasOffset,
+                                                  gridStep: controller.gridStep,
+                                                  mapSelected:
+                                                      controller.mapSelected,
+                                                  mapEditorPoints: controller
+                                                      .mapEditorPoints,
+                                                  selectedMapEditorPoint:
+                                                      controller
+                                                          .selectedMapEditorPoint),
                                             );
                                           }),
                                         ),
