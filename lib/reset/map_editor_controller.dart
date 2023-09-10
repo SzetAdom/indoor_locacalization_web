@@ -59,10 +59,10 @@ class MapEditorController extends ChangeNotifier {
     var normalizedOffset = normalize(offset.localPosition);
 
     if (selectedPointId != null) {
-      // var selectedPoint =
-      //     map.points.firstWhere((element) => element.id == selectedPointId);
-      // selectedPoint.x = normalizedOffset.dx;
-      // selectedPoint.y = normalizedOffset.dy;
+      var selectedPoint =
+          map.points.firstWhere((element) => element.id == selectedPointId);
+      selectedPoint.x = normalizedOffset.dx;
+      selectedPoint.y = normalizedOffset.dy;
       notifyListeners();
     } else {
       canvasOffset += offset.delta;
@@ -73,14 +73,14 @@ class MapEditorController extends ChangeNotifier {
   void onPanEnd() {
     if (selectedPointId != null) {
       //if point is outside of map increase map size
-      var selectedPoint =
-          map.points.firstWhere((element) => element.id == selectedPointId);
+      // var selectedPoint =
+      //     map.points.firstWhere((element) => element.id == selectedPointId);
 
-      if (selectedPoint.x > map.widthRight) {
-        map.extraWidthRigth += (selectedPoint.x - map.widthRight) + 10;
-      } else if (selectedPoint.x < map.widthLeft) {
-        map.extraWidthLeft += (map.widthLeft - selectedPoint.x) + 10;
-      }
+      // if (selectedPoint.x > map.widthRight) {
+      //   map.extraWidthRigth += (selectedPoint.x - map.widthRight) + 10;
+      // } else if (selectedPoint.x < map.widthLeft) {
+      //   map.extraWidthLeft += (map.widthLeft - selectedPoint.x) + 10;
+      // }
 
       selectedPointId = null;
       notifyListeners();
