@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indoor_localization_web/reset/map_editor_controller.dart';
@@ -48,6 +49,14 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
     return false;
   }
 
+  void onPointerScroll(PointerScrollEvent event) {
+    if (event.scrollDelta.dy < 0) {
+      controller.zoomIn(event.localPosition);
+    } else {
+      controller.zoomOut(event.localPosition);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,46 +96,52 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
                     );
                   }
 
-                  return Container(
-                    color: Colors.blueGrey,
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // const MapEditorControlPanel(),
-                              Expanded(
-                                child: Container(
-                                  height: MediaQuery.of(context).size.height,
-                                  color: Colors.grey,
-                                  child: GestureDetector(
-                                    onTapDown: (details) =>
-                                        controller.onTap(details.localPosition),
-                                    onPanStart: (details) => controller
-                                        .onPanStart(details.localPosition),
-                                    onPanUpdate: (details) =>
-                                        controller.onPanUpdate(details),
-                                    onPanEnd: (details) =>
-                                        controller.onPanEnd(),
-                                    child: ClipRect(
-                                      clipBehavior: Clip.hardEdge,
-                                      child: ConstrainedBox(
-                                        constraints: BoxConstraints(
-                                          maxWidth: controller.map.width,
-                                          maxHeight: controller.map.height,
-                                        ),
+                  return Listener(
+                    onPointerSignal: (event) {
+                      if (event is PointerScrollEvent) {
+                        onPointerScroll(event);
+                      }
+                    },
+                    child: Container(
+                      color: Colors.blueGrey,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // const MapEditorControlPanel(),
+                                Expanded(
+                                  child: Container(
+                                    height: MediaQuery.of(context).size.height,
+                                    color: Colors.grey,
+                                    child: GestureDetector(
+                                      onTapDown: (details) => controller
+                                          .onTap(details.localPosition),
+                                      onPanStart: (details) => controller
+                                          .onPanStart(details.localPosition),
+                                      onPanUpdate: (details) =>
+                                          controller.onPanUpdate(details),
+                                      onPanEnd: (details) =>
+                                          controller.onPanEnd(),
+                                      child: ClipRect(
+                                        clipBehavior: Clip.hardEdge,
                                         child: ConstrainedBox(
                                           constraints: BoxConstraints(
-                                            minWidth: controller.map.width,
-                                            minHeight: controller.map.height,
+                                            maxWidth: controller.map.width,
+                                            maxHeight: controller.map.height,
                                           ),
-                                          child: LayoutBuilder(
-                                              builder: (context, constrains) {
-                                            controller.canvasSize =
-                                                constrains.biggest;
-                                            return CustomPaint(
-                                              painter: MapEditorPainter(
+                                          child: ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                              minWidth: controller.map.width,
+                                              minHeight: controller.map.height,
+                                            ),
+                                            child: LayoutBuilder(
+                                                builder: (context, constrains) {
+                                              controller.canvasSize =
+                                                  constrains.biggest;
+                                              return CustomPaint(
+                                                painter: MapEditorPainter(
                                                   map: controller.map,
                                                   selectedPointId: controller
                                                       .selectedPointId,
@@ -139,38 +154,46 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
                                                       .mapEditorPoints,
                                                   selectedMapEditorPoint:
                                                       controller
-                                                          .selectedMapEditorPoint),
-                                            );
-                                          }),
+                                                          .selectedMapEditorPoint,
+                                                  zoomLevel:
+                                                      controller.zoomLevel,
+                                                  mapEditPointSize: controller
+                                                      .mapEditPointSize,
+                                                  pointSize:
+                                                      controller.pointSize,
+                                                ),
+                                              );
+                                            }),
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              // Container(
-                              //   width: 300,
-                              //   color: Colors.blueGrey,
-                              //   child: Column(children: [
-                              //     const SizedBox(
-                              //         height: 400, child: ObjectListWidget()),
-                              //     GestureDetector(
-                              //       child: Container(
-                              //           child: const Text(
-                              //         'Add object',
-                              //         style: TextStyle(color: Colors.white),
-                              //       )),
-                              //     ),
-                              //     IconButton(
-                              //         color: Colors.white,
-                              //         onPressed: () {},
-                              //         icon: const Icon(Icons.add)),
-                              //   ]),
-                              // )
-                            ],
+                                // Container(
+                                //   width: 300,
+                                //   color: Colors.blueGrey,
+                                //   child: Column(children: [
+                                //     const SizedBox(
+                                //         height: 400, child: ObjectListWidget()),
+                                //     GestureDetector(
+                                //       child: Container(
+                                //           child: const Text(
+                                //         'Add object',
+                                //         style: TextStyle(color: Colors.white),
+                                //       )),
+                                //     ),
+                                //     IconButton(
+                                //         color: Colors.white,
+                                //         onPressed: () {},
+                                //         icon: const Icon(Icons.add)),
+                                //   ]),
+                                // )
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 } else {

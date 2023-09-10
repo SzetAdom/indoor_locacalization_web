@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/map_model.dart';
 import 'package:indoor_localization_web/reset/map_point_model.dart';
@@ -40,7 +42,7 @@ class MapEditorController extends ChangeNotifier {
 
       final nearestPoint = map.points.first;
       var distance = (nearestPoint.toOffset() - normalizedOffset).distance;
-      if (distance < 10) {
+      if (distance < pointSize) {
         selectPoint(nearestPoint.id);
       } else {
         selectPoint(null);
@@ -56,7 +58,7 @@ class MapEditorController extends ChangeNotifier {
 
       final nearestPoint = mapEditorPointList.first;
       var distance = (nearestPoint - normalizedOffset).distance;
-      if (distance < 10) {
+      if (distance < mapEditPointSize) {
         selectedMapEditorPoint = mapEditorPoints.keys
             .firstWhere((element) => mapEditorPoints[element] == nearestPoint);
       } else {
@@ -93,6 +95,22 @@ class MapEditorController extends ChangeNotifier {
 
       selectedPoint.x = normalizedOffset.dx;
       selectedPoint.y = normalizedOffset.dy;
+
+      //if point is outside of map increase map size
+
+      if (map.widthRight - selectedPoint.x < 0) {
+        dev.log('increase width right');
+        map.setExtraWidthRigth(selectedPoint.x);
+      } else if (map.widthLeft + selectedPoint.x < 0) {
+        dev.log('increase width left');
+        map.setExtraWidthLeft(selectedPoint.x.abs());
+      } else if (map.heightBottom - selectedPoint.y < 0) {
+        dev.log('increase height bottom');
+        map.setExtraHeightBottom(selectedPoint.y);
+      } else if (map.heightTop + selectedPoint.y < 0) {
+        dev.log('increase height top');
+        map.setExtraHeightTop(selectedPoint.y.abs());
+      }
     } else if (mapSelected && selectedMapEditorPoint != null) {
       var delta = offset.delta;
       if (snapToGrid) {
@@ -107,6 +125,7 @@ class MapEditorController extends ChangeNotifier {
         }
       }
 
+      delta = delta / zoomLevel;
       switch (selectedMapEditorPoint) {
         case MapEditorPoint.topLeft:
           map.setExtraWidthLeft(map.extraWidthLeft - delta.dx);
@@ -141,23 +160,13 @@ class MapEditorController extends ChangeNotifier {
         default:
       }
     } else {
-      canvasOffset += offset.delta;
+      canvasOffset += offset.delta * (1 / zoomLevel);
     }
     notifyListeners();
   }
 
   void onPanEnd() {
     if (selectedPointId != null) {
-      //if point is outside of map increase map size
-      // var selectedPoint =
-      //     map.points.firstWhere((element) => element.id == selectedPointId);
-
-      // if (selectedPoint.x > map.widthRight) {
-      //   map.extraWidthRigth += (selectedPoint.x - map.widthRight) + 10;
-      // } else if (selectedPoint.x < map.widthLeft) {
-      //   map.extraWidthLeft += (map.widthLeft - selectedPoint.x) + 10;
-      // }
-
       selectedPointId = null;
       notifyListeners();
     }
@@ -172,10 +181,11 @@ class MapEditorController extends ChangeNotifier {
   }
 
   Offset translateFromCanvas(Offset offset) {
-    var horizontalOffset = (canvasSize.width / 2);
-    var verticalOffset = (canvasSize.height / 2);
+    var horizontalOffset = (canvasSize.width / 2) * zoomLevel;
+    var verticalOffset = (canvasSize.height / 2) * zoomLevel;
 
-    return offset.translate(-1 * horizontalOffset, -1 * verticalOffset);
+    return offset.translate(-1 * horizontalOffset, -1 * verticalOffset) /
+        zoomLevel;
   }
 
   Offset translateToMapOffset(Offset offset) {
@@ -225,6 +235,37 @@ class MapEditorController extends ChangeNotifier {
   Size canvasSize = Size.zero;
 
   double gridStep = 100;
+
+  double zoomLevel = 1.0;
+
+  double zoomSensitive = 0.07;
+
+  double pointSize = 10;
+
+  double get mapEditPointSize => 15 / zoomLevel;
+
+  void zoomIn(Offset mousePosition) {
+    var normalizedOffsetBefore = normalize(mousePosition);
+    zoomLevel += zoomSensitive;
+    var normalizedOffsetAfter = normalize(mousePosition);
+
+    var diff = normalizedOffsetBefore - normalizedOffsetAfter;
+
+    canvasOffset += diff * -1;
+    notifyListeners();
+  }
+
+  void zoomOut(Offset mousePosition) {
+    if (zoomLevel <= 0.1) return;
+    var normalizedOffsetBefore = normalize(mousePosition);
+    zoomLevel -= zoomSensitive;
+    var normalizedOffsetAfter = normalize(mousePosition);
+
+    var diff = normalizedOffsetBefore - normalizedOffsetAfter;
+
+    canvasOffset += diff * -1;
+    notifyListeners();
+  }
 }
 
 enum MapEditorPoint {

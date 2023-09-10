@@ -5,6 +5,9 @@ import 'package:indoor_localization_web/reset/map_editor_controller.dart';
 import 'package:indoor_localization_web/reset/map_model.dart';
 
 class MapEditorPainter extends CustomPainter {
+  double pointSize;
+  double mapEditPointSize;
+
   String? selectedPointId;
   Offset canvasOffset;
 
@@ -18,12 +21,17 @@ class MapEditorPainter extends CustomPainter {
 
   MapEditorPoint? selectedMapEditorPoint;
 
+  double zoomLevel;
+
   MapEditorPainter({
     required this.map,
     required this.canvasOffset,
     required this.gridStep,
     required this.mapSelected,
     required this.mapEditorPoints,
+    required this.zoomLevel,
+    required this.pointSize,
+    required this.mapEditPointSize,
     this.selectedMapEditorPoint,
     this.selectedPointId,
   });
@@ -36,7 +44,7 @@ class MapEditorPainter extends CustomPainter {
   void _drawPoint(Canvas canvas, Offset point, bool selected) {
     final paint = Paint()
       ..color = selected ? Colors.red : Colors.blue
-      ..strokeWidth = 10
+      ..strokeWidth = pointSize
       ..strokeCap = StrokeCap.round;
 
     canvas.drawPoints(PointMode.points, [point], paint);
@@ -196,14 +204,14 @@ class MapEditorPainter extends CustomPainter {
   void drawMapEditorPoints(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = Colors.green
-      ..strokeWidth = 15
+      ..strokeWidth = mapEditPointSize
       ..strokeCap = StrokeCap.round;
 
     for (var key in mapEditorPoints.keys) {
       if (selectedMapEditorPoint == key) {
-        paint.color = Colors.red;
+        paint.color = Colors.yellow;
       } else {
-        paint.color = Colors.blue;
+        paint.color = Colors.green;
       }
       canvas.drawPoints(
           PointMode.points,
@@ -216,6 +224,7 @@ class MapEditorPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    canvas.scale(zoomLevel);
     drawBaseBackground(canvas, size);
 
     canvas.translate(canvasOffset.dx, canvasOffset.dy);
@@ -226,6 +235,7 @@ class MapEditorPainter extends CustomPainter {
       horizontalCenterOffset,
       verticalCenterOffset,
     );
+
     drawMap(canvas, size);
 
     if (mapSelected) {
