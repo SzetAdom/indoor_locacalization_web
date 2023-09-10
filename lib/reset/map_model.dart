@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/map_point_model.dart';
 
 class MapModel {
@@ -10,10 +11,10 @@ class MapModel {
     required this.id,
     required this.name,
     required this.points,
-    this.widthRigth = 0,
-    this.widthLeft = 0,
-    this.heightTop = 0,
-    this.heightBottom = 0,
+    this.extraWidthRigth = 0,
+    this.extraWidthLeft = 0,
+    this.extraHeightTop = 0,
+    this.extraHeightBottom = 0,
   });
 
   factory MapModel.fromJson(Map<String, dynamic> json) {
@@ -29,13 +30,19 @@ class MapModel {
   double baseWidth = 500;
   double baseHeight = 500;
 
-  double widthRigth;
-  double widthLeft;
-  double heightTop;
-  double heightBottom;
+  Size get baseSize => Size(baseWidth, baseHeight);
 
-  double get width => baseWidth + widthRigth + widthLeft;
-  double get height => baseHeight + heightTop + heightBottom;
+  double extraWidthRigth;
+  double extraWidthLeft;
+  double extraHeightTop;
+  double extraHeightBottom;
+
+  double get width => baseWidth + extraWidthRigth + extraWidthLeft;
+  double get height => baseHeight + extraHeightTop + extraHeightBottom;
+  double get widthRight => baseWidth / 2 + extraWidthRigth;
+  double get widthLeft => baseWidth / 2 + extraWidthLeft;
+  double get heightTop => baseHeight / 2 + extraHeightTop;
+  double get heightBottom => baseHeight / 2 + extraHeightBottom;
 
   //starting point
   //list of objects

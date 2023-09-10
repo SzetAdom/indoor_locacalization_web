@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:indoor_localization_web/reset/map_editor_background_painter.dart';
 import 'package:indoor_localization_web/reset/map_editor_controller.dart';
 import 'package:indoor_localization_web/reset/map_editor_painer.dart';
 import 'package:provider/provider.dart';
@@ -101,37 +100,20 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
                                             minWidth: controller.map.width,
                                             minHeight: controller.map.height,
                                           ),
-                                          child: CustomPaint(
-                                            painter:
-                                                MapEditorBackgroundPainter(),
-                                            child: ConstrainedBox(
-                                                constraints: BoxConstraints(
-                                                  minWidth:
-                                                      controller.map.width,
-                                                  minHeight:
-                                                      controller.map.height,
-                                                ),
-                                                child: LayoutBuilder(builder:
-                                                    (context, constrains) {
-                                                  controller.canvasSize =
-                                                      constrains.biggest;
-                                                  return CustomPaint(
-                                                    painter: MapEditorPainter(
-                                                      points:
-                                                          controller.map.points,
-                                                      selectedPointId:
-                                                          controller
-                                                              .selectedPointId,
-                                                      mapSize: Size(
-                                                          controller.map.width,
-                                                          controller
-                                                              .map.height),
-                                                      mapOffset:
-                                                          controller.mapOffset,
-                                                    ),
-                                                  );
-                                                })),
-                                          ),
+                                          child: LayoutBuilder(
+                                              builder: (context, constrains) {
+                                            controller.canvasSize =
+                                                constrains.biggest;
+                                            return CustomPaint(
+                                              painter: MapEditorPainter(
+                                                map: controller.map,
+                                                selectedPointId:
+                                                    controller.selectedPointId,
+                                                canvasOffset:
+                                                    controller.canvasOffset,
+                                              ),
+                                            );
+                                          }),
                                         ),
                                       ),
                                     ),
