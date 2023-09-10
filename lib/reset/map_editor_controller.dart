@@ -1,5 +1,3 @@
-import 'dart:developer' as dev;
-
 import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/map_model.dart';
 import 'package:indoor_localization_web/reset/map_point_model.dart';
@@ -98,19 +96,22 @@ class MapEditorController extends ChangeNotifier {
 
       //if point is outside of map increase map size
 
-      if (map.widthRight - selectedPoint.x < 0) {
-        dev.log('increase width right');
-        map.setExtraWidthRigth(selectedPoint.x);
-      } else if (map.widthLeft + selectedPoint.x < 0) {
-        dev.log('increase width left');
-        map.setExtraWidthLeft(selectedPoint.x.abs());
-      } else if (map.heightBottom - selectedPoint.y < 0) {
-        dev.log('increase height bottom');
-        map.setExtraHeightBottom(selectedPoint.y);
-      } else if (map.heightTop + selectedPoint.y < 0) {
-        dev.log('increase height top');
-        map.setExtraHeightTop(selectedPoint.y.abs());
+      if (selectedPoint.x > 0 && selectedPoint.x > map.widthRight) {
+        map.addExtraWidthRigth(selectedPoint.x.abs() - map.widthRight);
       }
+      if (selectedPoint.x < 0 && selectedPoint.x.abs() > map.widthLeft) {
+        map.addExtraWidthLeft(selectedPoint.x.abs() - map.widthLeft);
+      }
+
+      if (selectedPoint.y > 0 && selectedPoint.y > map.heightBottom) {
+        map.addExtraHeightBottom(selectedPoint.y.abs() - map.heightBottom);
+      }
+
+      if (selectedPoint.y < 0 && selectedPoint.y.abs() > map.heightTop) {
+        map.addExtraHeightTop(selectedPoint.y.abs() - map.heightTop);
+      }
+
+      notifyListeners();
     } else if (mapSelected && selectedMapEditorPoint != null) {
       var delta = offset.delta;
       if (snapToGrid) {
@@ -128,34 +129,35 @@ class MapEditorController extends ChangeNotifier {
       delta = delta / zoomLevel;
       switch (selectedMapEditorPoint) {
         case MapEditorPoint.topLeft:
-          map.setExtraWidthLeft(map.extraWidthLeft - delta.dx);
-          map.setExtraHeightTop(map.extraHeightTop - delta.dy);
+          map.removeExtraWidthLeft(delta.dx);
+          map.removeExtraHeightTop(delta.dy);
           break;
         case MapEditorPoint.topRight:
-          map.setExtraWidthRigth(map.extraWidthRigth + delta.dx);
-          map.setExtraHeightTop(map.extraHeightTop - delta.dy);
+          map.addExtraWidthRigth(delta.dx);
+          map.removeExtraHeightTop(delta.dy);
 
           break;
         case MapEditorPoint.bottomLeft:
-          map.setExtraWidthLeft(map.extraWidthLeft - delta.dx);
-          map.setExtraHeightBottom(map.extraHeightBottom + delta.dy);
+          map.removeExtraWidthLeft(delta.dx);
+          map.addExtraHeightBottom(delta.dy);
           break;
         case MapEditorPoint.bottomRight:
-          map.setExtraWidthRigth(map.extraWidthRigth + delta.dx);
-          map.setExtraHeightBottom(map.extraHeightBottom + delta.dy);
+          map.addExtraWidthRigth(delta.dx);
+          map.addExtraHeightBottom(delta.dy);
 
           break;
         case MapEditorPoint.left:
-          map.setExtraWidthLeft(map.extraWidthLeft - delta.dx);
+          map.removeExtraWidthLeft(delta.dx);
+
           break;
         case MapEditorPoint.right:
-          map.setExtraWidthRigth(map.extraWidthRigth + delta.dx);
+          map.addExtraWidthRigth(delta.dx);
           break;
         case MapEditorPoint.top:
-          map.setExtraHeightTop(map.extraHeightTop - delta.dy);
+          map.removeExtraHeightTop(delta.dy);
           break;
         case MapEditorPoint.bottom:
-          map.setExtraHeightBottom(map.extraHeightBottom + delta.dy);
+          map.addExtraHeightBottom(delta.dy);
           break;
         default:
       }

@@ -32,30 +32,50 @@ class MapModel {
 
   Size get baseSize => Size(baseWidth, baseHeight);
 
+  void addExtraWidthRigth(double value) {
+    if (value < 0 && widthRight < 30) return;
+    extraWidthRigth += value;
+  }
+
+  void addExtraWidthLeft(double value) {
+    if (value < 0 && widthLeft < 30) return;
+    extraWidthLeft += value;
+  }
+
+  void addExtraHeightTop(double value) {
+    if (value < 0 && heightTop < 30) return;
+    extraHeightTop += value;
+  }
+
+  void addExtraHeightBottom(double value) {
+    if (value < 0 && heightBottom < 30) return;
+    extraHeightBottom += value;
+  }
+
+  void removeExtraWidthRigth(double value) {
+    if (value > 0 && widthRight < 30) return;
+    extraWidthRigth -= value;
+  }
+
+  void removeExtraWidthLeft(double value) {
+    if (value > 0 && widthLeft < 30) return;
+    extraWidthLeft -= value;
+  }
+
+  void removeExtraHeightTop(double value) {
+    if (value > 0 && heightTop < 30) return;
+    extraHeightTop -= value;
+  }
+
+  void removeExtraHeightBottom(double value) {
+    if (value > 0 && heightBottom < 30) return;
+    extraHeightBottom -= value;
+  }
+
   double extraWidthRigth;
-
-  void setExtraWidthRigth(double value) {
-    if (widthRight < 30) return;
-    extraWidthRigth = value;
-  }
-
   double extraWidthLeft;
-  void setExtraWidthLeft(double value) {
-    if (widthLeft < 30) return;
-    extraWidthLeft = value;
-  }
-
   double extraHeightTop;
-  void setExtraHeightTop(double value) {
-    if (heightTop < 30) return;
-    extraHeightTop = value;
-  }
-
   double extraHeightBottom;
-  void setExtraHeightBottom(double value) {
-    if (heightBottom < 30) return;
-    extraHeightBottom = value;
-  }
 
   double get width => baseWidth + extraWidthRigth + extraWidthLeft;
   double get height => baseHeight + extraHeightTop + extraHeightBottom;
