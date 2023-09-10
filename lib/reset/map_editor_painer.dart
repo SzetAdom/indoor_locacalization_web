@@ -64,9 +64,12 @@ class MapEditorPainter extends CustomPainter {
       canvas.drawLine(
           Offset(0, i.toDouble()), Offset(map.width, i.toDouble()), gridPaint);
     }
+    drawAxis(canvas, size);
+    drawAxisLabels(canvas, size);
+    drawMapSize(canvas, size);
+  }
 
-    //draw axis
-
+  void drawAxis(Canvas canvas, Size size) {
     final axisPaint = Paint()
       ..color = Colors.black
       ..strokeWidth = 1
@@ -77,9 +80,9 @@ class MapEditorPainter extends CustomPainter {
 
     canvas.drawLine(Offset(0, map.height / 2),
         Offset(map.width, map.height / 2), axisPaint);
+  }
 
-    //draw axis labels
-
+  void drawAxisLabels(Canvas canvas, Size size) {
     const textStyle = TextStyle(
       color: Colors.black,
       fontSize: 20,
@@ -113,8 +116,17 @@ class MapEditorPainter extends CustomPainter {
       canvas,
       Offset(map.width / 2, 0),
     );
+  }
 
-    //draw map size
+  void drawMapSize(Canvas canvas, Size size) {
+    const textStyle = TextStyle(
+      color: Colors.black,
+      fontSize: 20,
+    );
+    final textPainter = TextPainter(
+      textDirection: TextDirection.ltr,
+      textAlign: TextAlign.center,
+    );
 
     textPainter.text = TextSpan(
       text: 'width: ${map.width}',
@@ -138,20 +150,6 @@ class MapEditorPainter extends CustomPainter {
     textPainter.paint(
       canvas,
       Offset(0, map.height - textPainter.height * 2),
-    );
-
-    //draw map offset
-
-    textPainter.text = TextSpan(
-      text: 'offset: ${canvasOffset.dx}, ${canvasOffset.dy}',
-      style: textStyle,
-    );
-
-    textPainter.layout();
-
-    textPainter.paint(
-      canvas,
-      Offset(0, map.height - textPainter.height * 3),
     );
   }
 
