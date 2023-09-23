@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/map_model.dart';
+import 'package:indoor_localization_web/reset/map_objects/wall_object.dart';
 import 'package:indoor_localization_web/reset/map_point_model.dart';
 
 class MapEditorController extends ChangeNotifier {
@@ -15,12 +16,14 @@ class MapEditorController extends ChangeNotifier {
     map = MapModel(
       id: '0',
       name: 'test',
-      points: [
-        MapPointModel(id: '0', description: 'gugu', x: 0, y: 0),
-        MapPointModel(id: '1', description: 'gugu', x: 100, y: 100),
-        MapPointModel(id: '2', description: 'gugu', x: 200, y: 200),
-        MapPointModel(id: '3', description: 'gugu', x: 300, y: 300),
-        MapPointModel(id: '4', description: 'gugu', x: 400, y: 400),
+      objects: [
+        WallObject(id: '0', x: 0, y: 0, description: '', points: [
+          MapPointModel(id: '0', description: 'gugu', x: 0, y: 0),
+          MapPointModel(id: '1', description: 'gugu', x: 0, y: 100),
+          MapPointModel(id: '2', description: 'gugu', x: 100, y: 100),
+          MapPointModel(id: '3', description: 'gugu', x: 100, y: 0),
+          MapPointModel(id: '4', description: 'gugu', x: 100, y: 0),
+        ])
       ],
     );
     return true;
@@ -32,13 +35,15 @@ class MapEditorController extends ChangeNotifier {
     var normalizedOffset = normalize(offset);
 
     if (!mapSelected) {
-      map.points.sort((a, b) {
+      var points = map.objects.expand((element) => element.points).toList();
+
+      points.sort((a, b) {
         final distanceA = (a.toOffset() - normalizedOffset).distance;
         final distanceB = (b.toOffset() - normalizedOffset).distance;
         return distanceA.compareTo(distanceB);
       });
 
-      final nearestPoint = map.points.first;
+      final nearestPoint = points.first;
       var distance = (nearestPoint.toOffset() - normalizedOffset).distance;
       if (distance < pointSize) {
         selectPoint(nearestPoint.id);
@@ -70,11 +75,14 @@ class MapEditorController extends ChangeNotifier {
     onTap(offset);
   }
 
+  MapPointModel get selectedPoint {
+    return map.objects
+        .expand((element) => element.points)
+        .firstWhere((element) => element.id == selectedPointId);
+  }
+
   void onPanUpdate(DragUpdateDetails offset) {
     if (selectedPointId != null) {
-      var selectedPoint =
-          map.points.firstWhere((element) => element.id == selectedPointId);
-
       var normalizedOffset = normalize(offset.localPosition);
 
       //snap to grid

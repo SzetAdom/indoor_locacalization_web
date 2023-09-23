@@ -38,7 +38,19 @@ class MapEditorPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
+    if (oldDelegate is MapEditorPainter) {
+      return oldDelegate.map != map ||
+          oldDelegate.canvasOffset != canvasOffset ||
+          oldDelegate.gridStep != gridStep ||
+          oldDelegate.mapSelected != mapSelected ||
+          oldDelegate.mapEditorPoints != mapEditorPoints ||
+          oldDelegate.zoomLevel != zoomLevel ||
+          oldDelegate.pointSize != pointSize ||
+          oldDelegate.mapEditPointSize != mapEditPointSize ||
+          oldDelegate.selectedMapEditorPoint != selectedMapEditorPoint ||
+          oldDelegate.selectedPointId != selectedPointId;
+    }
+    return false;
   }
 
   void _drawPoint(Canvas canvas, Offset point, bool selected) {
@@ -248,8 +260,9 @@ class MapEditorPainter extends CustomPainter {
     );
 
     canvas.translate(map.baseWidth / 2, map.baseHeight / 2);
-    for (final point in map.points) {
-      _drawPoint(canvas, point.toOffset(), point.id == selectedPointId);
+
+    for (final mapObject in map.objects) {
+      mapObject.draw(canvas, size);
     }
   }
 }

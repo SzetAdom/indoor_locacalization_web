@@ -1,31 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:indoor_localization_web/reset/map_point_model.dart';
+import 'package:indoor_localization_web/reset/map_object_model.dart';
 
 class MapModel {
   String id;
   String name;
 
-  List<MapPointModel> points;
+  List<MapObjectModel> objects;
 
   MapModel({
     required this.id,
     required this.name,
-    required this.points,
+    required this.objects,
     this.extraWidthRigth = 100,
     this.extraWidthLeft = 100,
     this.extraHeightTop = 100,
     this.extraHeightBottom = 100,
   });
 
-  factory MapModel.fromJson(Map<String, dynamic> json) {
-    return MapModel(
-      id: json['id'],
-      name: json['name'],
-      points: json['points']
-          .map<MapPointModel>((point) => MapPointModel.fromJson(point))
-          .toList(),
-    );
-  }
+  // factory MapModel.fromJson(Map<String, dynamic> json) {
+  //   return MapModel(
+  //     id: json['id'],
+  //     name: json['name'],
+  //     points: json['points']
+  //         .map<MapPointModel>((point) => MapPointModel.fromJson(point))
+  //         .toList(),
+  //   );
+  // }
 
   double baseWidth = 500;
   double baseHeight = 500;

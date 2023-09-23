@@ -37,4 +37,45 @@ class MapPointModel {
       y,
     );
   }
+
+  void draw(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color ?? Colors.black
+      ..strokeWidth = 2
+      ..style = PaintingStyle.fill;
+
+    canvas.drawCircle(toOffset(), 5, paint);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'color': color,
+      'x': x,
+      'y': y,
+      'description': description,
+      'icon': icon,
+    };
+  }
+
+  MapPointModel copyWith({
+    String? id,
+    String? name,
+    Color? color,
+    double? x,
+    double? y,
+    String? description,
+    String? icon,
+  }) {
+    return MapPointModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      color: color ?? this.color,
+      x: x ?? this.x,
+      y: y ?? this.y,
+      description: description ?? this.description,
+      icon: icon ?? this.icon,
+    );
+  }
 }
