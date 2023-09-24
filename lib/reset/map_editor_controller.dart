@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/map_model.dart';
 import 'package:indoor_localization_web/reset/map_objects/wall_object.dart';
-import 'package:indoor_localization_web/reset/map_point_model.dart';
 
 class MapEditorController extends ChangeNotifier {
   void save() {}
@@ -18,11 +17,10 @@ class MapEditorController extends ChangeNotifier {
       name: 'test',
       objects: [
         WallObject(id: '0', x: 0, y: 0, description: '', points: [
-          MapPointModel(id: '0', description: 'gugu', x: 0, y: 0),
-          MapPointModel(id: '1', description: 'gugu', x: 0, y: 100),
-          MapPointModel(id: '2', description: 'gugu', x: 100, y: 100),
-          MapPointModel(id: '3', description: 'gugu', x: 100, y: 0),
-          MapPointModel(id: '4', description: 'gugu', x: 100, y: 0),
+          const Offset(0, 0),
+          const Offset(0, 100),
+          const Offset(100, 100),
+          const Offset(100, 0),
         ])
       ],
     );
@@ -35,21 +33,44 @@ class MapEditorController extends ChangeNotifier {
     var normalizedOffset = normalize(offset);
 
     if (!mapSelected) {
-      var points = map.objects.expand((element) => element.points).toList();
-
-      points.sort((a, b) {
-        final distanceA = (a.toOffset() - normalizedOffset).distance;
-        final distanceB = (b.toOffset() - normalizedOffset).distance;
-        return distanceA.compareTo(distanceB);
-      });
-
-      final nearestPoint = points.first;
-      var distance = (nearestPoint.toOffset() - normalizedOffset).distance;
-      if (distance < pointSize) {
-        selectPoint(nearestPoint.id);
-      } else {
-        selectPoint(null);
+      //check if point is under mouse
+      for (var i = map.objects.length - 1; i >= 0; i--) {
+        try {
+          var point = map.objects[i].isPointUnderMouse(normalizedOffset);
+          if (point != null) {
+            selectPoint(map.objects[i].id, index: point);
+            return;
+          } else {
+            //if mouse is inside object select object
+            bool isObjectSelected =
+                map.objects[i].isObjectUnderMouse(normalizedOffset);
+            if (isObjectSelected) {
+              selectPoint(map.objects[i].id);
+              return;
+            }
+          }
+        } catch (e) {
+          print(e);
+        }
       }
+
+      selectPoint(null);
+
+      // var points = map.objects.expand((element) => element.points).toList();
+
+      // points.sort((a, b) {
+      //   final distanceA = (a - normalizedOffset).distance;
+      //   final distanceB = (b - normalizedOffset).distance;
+      //   return distanceA.compareTo(distanceB);
+      // });
+
+      // final nearestPoint = points.first;
+      // var distance = (nearestPoint - normalizedOffset).distance;
+      // if (distance < pointSize) {
+      //   selectPoint(nearestPoint);
+      // } else {
+      //   selectPoint(null);
+      // }
     } else {
       var mapEditorPointList = mapEditorPoints.values.toList();
 
@@ -62,27 +83,27 @@ class MapEditorController extends ChangeNotifier {
       final nearestPoint = mapEditorPointList.first;
       var distance = (nearestPoint - normalizedOffset).distance;
       if (distance < mapEditPointSize) {
-        selectedMapEditorPoint = mapEditorPoints.keys
-            .firstWhere((element) => mapEditorPoints[element] == nearestPoint);
+        selectMapEditorPoint(mapEditorPoints.keys
+            .firstWhere((element) => mapEditorPoints[element] == nearestPoint));
       } else {
-        selectedMapEditorPoint = null;
+        selectMapEditorPoint(null);
       }
     }
-    notifyListeners();
   }
 
   void onPanStart(Offset offset) {
     onTap(offset);
   }
 
-  MapPointModel get selectedPoint {
+  Offset? get selectedPoint {
+    if (selectedObjectId == null || selectedPointIndex == null) return null;
     return map.objects
-        .expand((element) => element.points)
-        .firstWhere((element) => element.id == selectedPointId);
+        .firstWhere((element) => element.id == selectedObjectId)
+        .points[selectedPointIndex!];
   }
 
   void onPanUpdate(DragUpdateDetails offset) {
-    if (selectedPointId != null) {
+    if (selectedObjectId != null) {
       var normalizedOffset = normalize(offset.localPosition);
 
       //snap to grid
@@ -99,24 +120,29 @@ class MapEditorController extends ChangeNotifier {
         }
       }
 
-      selectedPoint.x = normalizedOffset.dx;
-      selectedPoint.y = normalizedOffset.dy;
+      if (selectedPointIndex == null) {
+        map.objects[map.objects.indexWhere(
+                (element) => element.id == selectedObjectId)] //get object
+            .moveObjectBy(offset.delta * 1 / zoomLevel); //move point
+      } else {
+        map.objects[map.objects.indexWhere(
+                (element) => element.id == selectedObjectId)] //get object
+            .movePointTo(selectedPointIndex!, normalizedOffset); //move point
 
-      //if point is outside of map increase map size
+        if (selectedPoint!.dx > 0 && selectedPoint!.dx > map.widthRight) {
+          map.addExtraWidthRigth(selectedPoint!.dx.abs() - map.widthRight);
+        }
+        if (selectedPoint!.dx < 0 && selectedPoint!.dx.abs() > map.widthLeft) {
+          map.addExtraWidthLeft(selectedPoint!.dx.abs() - map.widthLeft);
+        }
 
-      if (selectedPoint.x > 0 && selectedPoint.x > map.widthRight) {
-        map.addExtraWidthRigth(selectedPoint.x.abs() - map.widthRight);
-      }
-      if (selectedPoint.x < 0 && selectedPoint.x.abs() > map.widthLeft) {
-        map.addExtraWidthLeft(selectedPoint.x.abs() - map.widthLeft);
-      }
+        if (selectedPoint!.dy > 0 && selectedPoint!.dy > map.heightBottom) {
+          map.addExtraHeightBottom(selectedPoint!.dy.abs() - map.heightBottom);
+        }
 
-      if (selectedPoint.y > 0 && selectedPoint.y > map.heightBottom) {
-        map.addExtraHeightBottom(selectedPoint.y.abs() - map.heightBottom);
-      }
-
-      if (selectedPoint.y < 0 && selectedPoint.y.abs() > map.heightTop) {
-        map.addExtraHeightTop(selectedPoint.y.abs() - map.heightTop);
+        if (selectedPoint!.dy < 0 && selectedPoint!.dy.abs() > map.heightTop) {
+          map.addExtraHeightTop(selectedPoint!.dy.abs() - map.heightTop);
+        }
       }
 
       notifyListeners();
@@ -176,8 +202,8 @@ class MapEditorController extends ChangeNotifier {
   }
 
   void onPanEnd() {
-    if (selectedPointId != null) {
-      selectedPointId = null;
+    if (selectedObjectId != null) {
+      selectedObjectId = null;
       notifyListeners();
     }
     if (selectedMapEditorPoint != null) {
@@ -204,12 +230,13 @@ class MapEditorController extends ChangeNotifier {
 
   Offset canvasOffset = Offset.zero;
 
-  String? selectedPointId;
+  String? selectedObjectId;
+  int? selectedPointIndex;
 
   bool mapSelected = false;
 
   void selectMap(bool selected) {
-    selectedPointId = null;
+    selectedObjectId = null;
     mapSelected = selected;
     notifyListeners();
   }
@@ -221,8 +248,9 @@ class MapEditorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void selectPoint(String? id) {
-    selectedPointId = id;
+  void selectPoint(String? objectId, {int? index}) {
+    selectedObjectId = objectId;
+    selectedPointIndex = index;
     mapSelected = false;
     notifyListeners();
   }
@@ -241,6 +269,11 @@ class MapEditorController extends ChangeNotifier {
   }
 
   MapEditorPoint? selectedMapEditorPoint;
+
+  void selectMapEditorPoint(MapEditorPoint? point) {
+    selectedMapEditorPoint = point;
+    notifyListeners();
+  }
 
   Size canvasSize = Size.zero;
 

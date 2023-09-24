@@ -144,7 +144,7 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
                                                 painter: MapEditorPainter(
                                                   map: controller.map,
                                                   selectedPointId: controller
-                                                      .selectedPointId,
+                                                      .selectedObjectId,
                                                   canvasOffset:
                                                       controller.canvasOffset,
                                                   gridStep: controller.gridStep,

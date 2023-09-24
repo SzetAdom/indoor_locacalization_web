@@ -1,21 +1,27 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'package:indoor_localization_web/reset/map_point_model.dart';
 
 abstract class MapObjectInterface {
-  void addPoint(MapPointModel point);
-  void removePoint(MapPointModel point);
-  void movePointBy(MapPointModel point, Offset offset);
-  void movePointTo(MapPointModel point, Offset offset);
+  void addPoint(Offset point);
+  void removePoint(Offset point);
+  void movePointBy(int index, Offset offset);
+  void movePointTo(int index, Offset offset);
+  void moveObjectBy(Offset offset);
   void draw(Canvas canvas, Size size);
+  int? isPointUnderMouse(Offset point);
+  bool isObjectUnderMouse(Offset point);
 }
 
 class MapObjectModel implements MapObjectInterface {
+  static const double pointRadius = 10;
+
   String id;
   String? name;
   Color? color;
   String? icon;
   String? description;
-  List<MapPointModel> points;
+  List<Offset> points;
 
   MapObjectModel({
     required this.id,
@@ -32,7 +38,7 @@ class MapObjectModel implements MapObjectInterface {
     Color? color,
     String? icon,
     String? description,
-    List<MapPointModel>? points,
+    List<Offset>? points,
   }) {
     return MapObjectModel(
       id: id ?? this.id,
@@ -44,56 +50,57 @@ class MapObjectModel implements MapObjectInterface {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'color': color,
-      'icon': icon,
-      'description': description,
-      'points': points.map((e) => e.toJson()).toList(),
-    };
-  }
-
-  factory MapObjectModel.fromJson(Map<String, dynamic> json) {
-    return MapObjectModel(
-      id: json['id'],
-      name: json['name'],
-      color: json['color'],
-      icon: json['icon'],
-      description: json['description'],
-      points: (json['points'] as List)
-          .map((e) => MapPointModel.fromJson(e))
-          .toList(),
-    );
-  }
-
   @override
-  void addPoint(MapPointModel point) {
+  void addPoint(Offset point) {
     points.add(point);
   }
 
   @override
-  void removePoint(MapPointModel point) {
+  void draw(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.blue
+      ..strokeWidth = pointRadius
+      ..strokeCap = StrokeCap.round;
+
+    //draw only the points
+    canvas.drawPoints(PointMode.points, points, paint);
+  }
+
+  @override
+  void movePointBy(int index, Offset offset) {
+    points[index] += offset;
+  }
+
+  @override
+  void moveObjectBy(Offset offset) {
+    for (var i = 0; i < points.length; i++) {
+      points[i] += offset;
+    }
+  }
+
+  @override
+  void movePointTo(int index, Offset offset) {
+    points[index] = offset;
+  }
+
+  @override
+  void removePoint(Offset point) {
     points.remove(point);
   }
 
   @override
-  void movePointBy(MapPointModel point, Offset offset) {
-    point.x += offset.dx;
-    point.y += offset.dy;
-  }
-
-  @override
-  void movePointTo(MapPointModel point, Offset offset) {
-    point.x = offset.dx;
-    point.y = offset.dy;
-  }
-
-  @override
-  void draw(Canvas canvas, Size size) {
-    for (var point in points) {
-      point.draw(canvas, size);
+  int? isPointUnderMouse(Offset mouse) {
+    for (var i = 0; i < points.length; i++) {
+      var distance = (points[i] - mouse).distance;
+      if (distance < pointRadius) {
+        return i;
+      }
     }
+    return null;
+  }
+
+  @override
+  bool isObjectUnderMouse(Offset point) {
+    throw UnimplementedError();
   }
 }

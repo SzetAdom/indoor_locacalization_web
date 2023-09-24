@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:indoor_localization_web/reset/map_helper.dart';
 import 'package:indoor_localization_web/reset/map_object_model.dart';
-import 'package:indoor_localization_web/reset/map_point_model.dart';
 
 class WallObject extends MapObjectModel {
   WallObject({
@@ -11,7 +11,7 @@ class WallObject extends MapObjectModel {
     required double y,
     required String description,
     String? icon,
-    List<MapPointModel>? points,
+    List<Offset>? points,
   }) : super(
           id: id,
           name: name,
@@ -21,29 +21,14 @@ class WallObject extends MapObjectModel {
           points: points ?? [],
         );
 
-  factory WallObject.fromJson(Map<String, dynamic> json) {
-    return WallObject(
-      id: json['id'],
-      name: json['name'],
-      color: json['color'],
-      x: json['x'],
-      y: json['y'],
-      description: json['description'],
-      icon: json['icon'],
-      points: (json['points'] as List<dynamic>)
-          .map((e) => MapPointModel.fromJson(e))
-          .toList(),
-    );
-  }
-
   @override
   void draw(Canvas canvas, Size size) {
     final path = Path();
 
-    path.moveTo(points.first.x, points.first.y);
+    path.moveTo(points.first.dx, points.first.dy);
 
     for (var i = 1; i < points.length; i++) {
-      path.lineTo(points[i].x, points[i].y);
+      path.lineTo(points[i].dx, points[i].dy);
     }
 
     path.close();
@@ -60,6 +45,34 @@ class WallObject extends MapObjectModel {
 
     canvas.drawPath(path, fillPaint);
     canvas.drawPath(path, drawPaint);
+
+    //draw only the points
+
     super.draw(canvas, size);
+  }
+
+  @override
+  bool isObjectUnderMouse(Offset point) {
+    final path = Path();
+
+    path.moveTo(points.first.dx, points.first.dy);
+
+    for (var i = 1; i < points.length; i++) {
+      path.lineTo(points[i].dx, points[i].dy);
+    }
+
+    path.close();
+
+    bool edgeContaines = path.contains(point);
+
+    //check if the point is inside the polygon
+    //https://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon
+    bool pointContains = MapHelper.polyContains(
+        points.length,
+        points.map((e) => e.dx).toList(),
+        points.map((e) => e.dy).toList(),
+        point);
+
+    return edgeContaines || pointContains;
   }
 }
