@@ -8,7 +8,7 @@ abstract class MapObjectInterface {
   void movePointBy(int index, Offset offset);
   void movePointTo(int index, Offset offset);
   void moveObjectBy(Offset offset);
-  void draw(Canvas canvas, Size size);
+  void draw(Canvas canvas, Size size, {bool selected = false});
   int? isPointUnderMouse(Offset point);
   bool isObjectUnderMouse(Offset point);
 }
@@ -56,7 +56,7 @@ class MapObjectModel implements MapObjectInterface {
   }
 
   @override
-  void draw(Canvas canvas, Size size) {
+  void draw(Canvas canvas, Size size, {bool selected = false}) {
     final paint = Paint()
       ..color = Colors.blue
       ..strokeWidth = pointRadius

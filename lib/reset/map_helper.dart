@@ -25,4 +25,35 @@ class MapHelper {
 
     return c == 1;
   }
+
+  static bool edgeContainsWithTolerance(List<Offset> points, Offset point,
+      {double tolerance = 10}) {
+    final path = Path();
+
+    path.moveTo(points.first.dx, points.first.dy);
+
+    for (var i = 1; i < points.length; i++) {
+      path.lineTo(points[i].dx, points[i].dy);
+    }
+
+    path.close();
+
+    final rect = path.getBounds();
+
+    final left = rect.left - tolerance;
+    final right = rect.right + tolerance;
+    final top = rect.top - tolerance;
+    final bottom = rect.bottom + tolerance;
+
+    final rectPath = Path()
+      ..moveTo(left, top)
+      ..lineTo(right, top)
+      ..lineTo(right, bottom)
+      ..lineTo(left, bottom)
+      ..close();
+
+    bool edgeContaines = rectPath.contains(point);
+
+    return edgeContaines;
+  }
 }

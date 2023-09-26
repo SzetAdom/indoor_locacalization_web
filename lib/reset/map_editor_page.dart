@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:indoor_localization_web/reset/map_editor_controller.dart';
 import 'package:indoor_localization_web/reset/map_editor_painer.dart';
+import 'package:indoor_localization_web/reset/widget/control_panel_widget.dart';
 import 'package:provider/provider.dart';
 
 class MapEditorPage extends StatefulWidget {
@@ -57,35 +58,70 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
     }
   }
 
+  Widget get toolBar {
+    return Row(
+      children: [
+        //select tool
+        IconButton(
+            onPressed: () {
+              controller.setEditMode(EditMode.select);
+            },
+            icon: Icon(
+              Icons.highlight_alt,
+              color: controller.editMode == EditMode.select
+                  ? Colors.black
+                  : Colors.grey,
+            )),
+
+        //add object tool
+
+        //move tool
+        IconButton(
+            onPressed: () {
+              controller.setEditMode(EditMode.move);
+            },
+            icon: Icon(
+              Icons.pan_tool,
+              color: controller.editMode == EditMode.move
+                  ? Colors.black
+                  : Colors.grey,
+            )),
+        //add point tool
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: () {
-              // controller.save();
-            },
-            icon: const Icon(Icons.save),
+    return ChangeNotifierProvider<MapEditorController>(
+      create: (context) => controller,
+      child: Consumer<MapEditorController>(builder: (context, value, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: toolBar,
+            elevation: 10,
+            actions: [
+              IconButton(
+                onPressed: () {
+                  // controller.save();
+                },
+                icon: const Icon(Icons.save),
+              ),
+              IconButton(
+                onPressed: () {
+                  // controller.undo();
+                },
+                icon: const Icon(Icons.undo),
+              ),
+              IconButton(
+                onPressed: () {
+                  // controller.redo();
+                },
+                icon: const Icon(Icons.redo),
+              ),
+            ],
           ),
-          IconButton(
-            onPressed: () {
-              // controller.undo();
-            },
-            icon: const Icon(Icons.undo),
-          ),
-          IconButton(
-            onPressed: () {
-              // controller.redo();
-            },
-            icon: const Icon(Icons.redo),
-          ),
-        ],
-      ),
-      body: ChangeNotifierProvider<MapEditorController>(
-        create: (context) => controller,
-        child: Consumer<MapEditorController>(
-          builder: (context, value, child) => FutureBuilder(
+          body: FutureBuilder(
               future: future,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
@@ -110,7 +146,7 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // const MapEditorControlPanel(),
+                                const ControlPanelWidget(),
                                 Expanded(
                                   child: Container(
                                     height: MediaQuery.of(context).size.height,
@@ -202,8 +238,8 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
                   );
                 }
               }),
-        ),
-      ),
+        );
+      }),
     );
   }
 }

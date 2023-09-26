@@ -2,7 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/map_model.dart';
 import 'package:indoor_localization_web/reset/map_objects/wall_object.dart';
 
+enum EditMode {
+  select,
+  move,
+  resize,
+}
+
 class MapEditorController extends ChangeNotifier {
+  EditMode editMode = EditMode.select;
+
+  void setEditMode(EditMode mode) {
+    editMode = mode;
+    notifyListeners();
+  }
+
   void save() {}
 
   void undo() {}
@@ -16,18 +29,36 @@ class MapEditorController extends ChangeNotifier {
       id: '0',
       name: 'test',
       objects: [
-        WallObject(id: '0', x: 0, y: 0, description: '', points: [
-          const Offset(0, 0),
-          const Offset(0, 100),
-          const Offset(100, 100),
-          const Offset(100, 0),
-        ])
+        WallObject(
+            id: '0',
+            color: Colors.red,
+            x: 0,
+            y: 0,
+            description: '',
+            points: [
+              const Offset(0, 0),
+              const Offset(0, 100),
+              const Offset(100, 100),
+              const Offset(100, 0),
+            ]),
+        WallObject(
+            id: '1',
+            color: Colors.green,
+            x: 0,
+            y: 0,
+            description: '',
+            points: [
+              const Offset(0, 0),
+              const Offset(0, 100),
+              const Offset(100, 100),
+              const Offset(100, 0),
+            ]),
       ],
     );
     return true;
   }
 
-  void onTap(Offset offset) {
+  void onTap(Offset offset, {bool deselect = true}) {
     //select nearest point
 
     var normalizedOffset = normalize(offset);
@@ -38,14 +69,14 @@ class MapEditorController extends ChangeNotifier {
         try {
           var point = map.objects[i].isPointUnderMouse(normalizedOffset);
           if (point != null) {
-            selectPoint(map.objects[i].id, index: point);
+            selectObject(map.objects[i].id, index: point);
             return;
           } else {
             //if mouse is inside object select object
             bool isObjectSelected =
                 map.objects[i].isObjectUnderMouse(normalizedOffset);
             if (isObjectSelected) {
-              selectPoint(map.objects[i].id);
+              selectObject(map.objects[i].id);
               return;
             }
           }
@@ -53,9 +84,9 @@ class MapEditorController extends ChangeNotifier {
           print(e);
         }
       }
-
-      selectPoint(null);
-
+      if (deselect) {
+        selectObject(null);
+      }
       // var points = map.objects.expand((element) => element.points).toList();
 
       // points.sort((a, b) {
@@ -92,7 +123,7 @@ class MapEditorController extends ChangeNotifier {
   }
 
   void onPanStart(Offset offset) {
-    onTap(offset);
+    onTap(offset, deselect: false);
   }
 
   Offset? get selectedPoint {
@@ -178,7 +209,6 @@ class MapEditorController extends ChangeNotifier {
         case MapEditorPoint.bottomRight:
           map.addExtraWidthRigth(delta.dx);
           map.addExtraHeightBottom(delta.dy);
-
           break;
         case MapEditorPoint.left:
           map.removeExtraWidthLeft(delta.dx);
@@ -203,7 +233,7 @@ class MapEditorController extends ChangeNotifier {
 
   void onPanEnd() {
     if (selectedObjectId != null) {
-      selectedObjectId = null;
+      // selectedObjectId = null;
       notifyListeners();
     }
     if (selectedMapEditorPoint != null) {
@@ -248,7 +278,7 @@ class MapEditorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void selectPoint(String? objectId, {int? index}) {
+  void selectObject(String? objectId, {int? index}) {
     selectedObjectId = objectId;
     selectedPointIndex = index;
     mapSelected = false;
@@ -277,7 +307,7 @@ class MapEditorController extends ChangeNotifier {
 
   Size canvasSize = Size.zero;
 
-  double gridStep = 100;
+  double gridStep = 10;
 
   double zoomLevel = 1.0;
 

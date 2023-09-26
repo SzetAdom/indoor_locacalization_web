@@ -262,7 +262,7 @@ class MapEditorPainter extends CustomPainter {
     canvas.translate(map.baseWidth / 2, map.baseHeight / 2);
 
     for (final mapObject in map.objects) {
-      mapObject.draw(canvas, size);
+      mapObject.draw(canvas, size, selected: mapObject.id == selectedPointId);
     }
   }
 }

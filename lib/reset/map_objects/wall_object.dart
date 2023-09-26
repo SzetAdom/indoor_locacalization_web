@@ -22,7 +22,7 @@ class WallObject extends MapObjectModel {
         );
 
   @override
-  void draw(Canvas canvas, Size size) {
+  void draw(Canvas canvas, Size size, {bool selected = false}) {
     final path = Path();
 
     path.moveTo(points.first.dx, points.first.dy);
@@ -34,7 +34,7 @@ class WallObject extends MapObjectModel {
     path.close();
 
     final fillPaint = Paint()
-      ..color = color ?? Colors.red.withOpacity(0.5)
+      ..color = color?.withOpacity(0.5) ?? Colors.red.withOpacity(0.5)
       ..strokeWidth = 1
       ..style = PaintingStyle.fill;
 
@@ -47,23 +47,16 @@ class WallObject extends MapObjectModel {
     canvas.drawPath(path, drawPaint);
 
     //draw only the points
-
-    super.draw(canvas, size);
+    if (selected) {
+      super.draw(canvas, size);
+    }
   }
 
   @override
   bool isObjectUnderMouse(Offset point) {
-    final path = Path();
-
-    path.moveTo(points.first.dx, points.first.dy);
-
-    for (var i = 1; i < points.length; i++) {
-      path.lineTo(points[i].dx, points[i].dy);
+    if (MapHelper.edgeContainsWithTolerance(points, point, tolerance: 1)) {
+      return true;
     }
-
-    path.close();
-
-    bool edgeContaines = path.contains(point);
 
     //check if the point is inside the polygon
     //https://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon
@@ -73,6 +66,6 @@ class WallObject extends MapObjectModel {
         points.map((e) => e.dy).toList(),
         point);
 
-    return edgeContaines || pointContains;
+    return pointContains;
   }
 }
