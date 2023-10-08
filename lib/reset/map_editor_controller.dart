@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/map_model.dart';
 import 'package:indoor_localization_web/reset/map_objects/wall_object.dart';
+import 'package:indoor_localization_web/reset/model/door_model.dart';
+import 'package:indoor_localization_web/reset/model/map_object_point_model.dart';
+import 'package:indoor_localization_web/reset/model/wall_object_point_model.dart';
 
 enum EditMode {
   select,
@@ -29,30 +32,31 @@ class MapEditorController extends ChangeNotifier {
       id: '0',
       name: 'test',
       objects: [
-        WallObject(
-            id: '0',
-            color: Colors.red,
-            x: 0,
-            y: 0,
-            description: '',
-            points: [
-              const Offset(0, 0),
-              const Offset(0, 100),
-              const Offset(100, 100),
-              const Offset(100, 0),
-            ]),
-        WallObject(
-            id: '1',
-            color: Colors.green,
-            x: 0,
-            y: 0,
-            description: '',
-            points: [
-              const Offset(0, 0),
-              const Offset(0, 100),
-              const Offset(100, 100),
-              const Offset(100, 0),
-            ]),
+        WallObject(id: '0', x: 0, y: 0, description: '', points: [
+          WallObjectPointModel(point: const Offset(50, 50), isDoor: false),
+          WallObjectPointModel(point: const Offset(50, 150), isDoor: false),
+          WallObjectPointModel(point: const Offset(150, 150), isDoor: false),
+          WallObjectPointModel(point: const Offset(150, 50), isDoor: false),
+        ], doors: [
+          DoorModel(
+            firstPointIndex: 0,
+            secontPointIndex: 1,
+            distanceToFirstPoint: 20,
+            distanceToSecondPoint: 20,
+          )
+        ]),
+        // WallObject(
+        //     id: '1',
+        //     color: Colors.green,
+        //     x: 0,
+        //     y: 0,
+        //     description: '',
+        //     points: [
+        //       const Offset(0, 0),
+        //       const Offset(0, 100),
+        //       const Offset(100, 100),
+        //       const Offset(100, 0),
+        //     ]),
       ],
     );
     return true;
@@ -126,7 +130,7 @@ class MapEditorController extends ChangeNotifier {
     onTap(offset, deselect: false);
   }
 
-  Offset? get selectedPoint {
+  MapObjectPointModel? get selectedPoint {
     if (selectedObjectId == null || selectedPointIndex == null) return null;
     return map.objects
         .firstWhere((element) => element.id == selectedObjectId)
@@ -160,19 +164,25 @@ class MapEditorController extends ChangeNotifier {
                 (element) => element.id == selectedObjectId)] //get object
             .movePointTo(selectedPointIndex!, normalizedOffset); //move point
 
-        if (selectedPoint!.dx > 0 && selectedPoint!.dx > map.widthRight) {
-          map.addExtraWidthRigth(selectedPoint!.dx.abs() - map.widthRight);
+        if (selectedPoint!.point.dx > 0 &&
+            selectedPoint!.point.dx > map.widthRight) {
+          map.addExtraWidthRigth(
+              selectedPoint!.point.dx.abs() - map.widthRight);
         }
-        if (selectedPoint!.dx < 0 && selectedPoint!.dx.abs() > map.widthLeft) {
-          map.addExtraWidthLeft(selectedPoint!.dx.abs() - map.widthLeft);
+        if (selectedPoint!.point.dx < 0 &&
+            selectedPoint!.point.dx.abs() > map.widthLeft) {
+          map.addExtraWidthLeft(selectedPoint!.point.dx.abs() - map.widthLeft);
         }
 
-        if (selectedPoint!.dy > 0 && selectedPoint!.dy > map.heightBottom) {
-          map.addExtraHeightBottom(selectedPoint!.dy.abs() - map.heightBottom);
+        if (selectedPoint!.point.dy > 0 &&
+            selectedPoint!.point.dy > map.heightBottom) {
+          map.addExtraHeightBottom(
+              selectedPoint!.point.dy.abs() - map.heightBottom);
         }
 
-        if (selectedPoint!.dy < 0 && selectedPoint!.dy.abs() > map.heightTop) {
-          map.addExtraHeightTop(selectedPoint!.dy.abs() - map.heightTop);
+        if (selectedPoint!.point.dy < 0 &&
+            selectedPoint!.point.dy.abs() > map.heightTop) {
+          map.addExtraHeightTop(selectedPoint!.point.dy.abs() - map.heightTop);
         }
       }
 
@@ -307,7 +317,7 @@ class MapEditorController extends ChangeNotifier {
 
   Size canvasSize = Size.zero;
 
-  double gridStep = 10;
+  double gridStep = 1000;
 
   double zoomLevel = 1.0;
 

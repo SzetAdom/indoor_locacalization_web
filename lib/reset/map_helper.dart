@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 class MapHelper {
@@ -55,5 +56,21 @@ class MapHelper {
     bool edgeContaines = rectPath.contains(point);
 
     return edgeContaines;
+  }
+
+  static double direction(Offset from, Offset to) {
+    final dx = to.dx - from.dx;
+    final dy = to.dy - from.dy;
+
+    final radians = atan2(dy, dx);
+
+    return radians;
+  }
+
+  static Offset offsetFromDirection(double direction, double distance) {
+    final dx = distance * cos(direction);
+    final dy = distance * sin(direction);
+
+    return Offset(dx, dy);
   }
 }

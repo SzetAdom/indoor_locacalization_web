@@ -1,10 +1,11 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:indoor_localization_web/reset/model/map_object_point_model.dart';
 
 abstract class MapObjectInterface {
-  void addPoint(Offset point);
-  void removePoint(Offset point);
+  void addPoint(MapObjectPointModel point);
+  void removePoint(MapObjectPointModel point);
   void movePointBy(int index, Offset offset);
   void movePointTo(int index, Offset offset);
   void moveObjectBy(Offset offset);
@@ -21,7 +22,7 @@ class MapObjectModel implements MapObjectInterface {
   Color? color;
   String? icon;
   String? description;
-  List<Offset> points;
+  List<MapObjectPointModel> points;
 
   MapObjectModel({
     required this.id,
@@ -38,7 +39,7 @@ class MapObjectModel implements MapObjectInterface {
     Color? color,
     String? icon,
     String? description,
-    List<Offset>? points,
+    List<MapObjectPointModel>? points,
   }) {
     return MapObjectModel(
       id: id ?? this.id,
@@ -51,7 +52,7 @@ class MapObjectModel implements MapObjectInterface {
   }
 
   @override
-  void addPoint(Offset point) {
+  void addPoint(MapObjectPointModel point) {
     points.add(point);
   }
 
@@ -63,35 +64,36 @@ class MapObjectModel implements MapObjectInterface {
       ..strokeCap = StrokeCap.round;
 
     //draw only the points
-    canvas.drawPoints(PointMode.points, points, paint);
+    canvas.drawPoints(
+        PointMode.points, points.map((e) => e.point).toList(), paint);
   }
 
   @override
   void movePointBy(int index, Offset offset) {
-    points[index] += offset;
+    points[index].point += offset;
   }
 
   @override
   void moveObjectBy(Offset offset) {
     for (var i = 0; i < points.length; i++) {
-      points[i] += offset;
+      points[i].point += offset;
     }
   }
 
   @override
   void movePointTo(int index, Offset offset) {
-    points[index] = offset;
+    points[index].point = offset;
   }
 
   @override
-  void removePoint(Offset point) {
+  void removePoint(MapObjectPointModel point) {
     points.remove(point);
   }
 
   @override
   int? isPointUnderMouse(Offset mouse) {
     for (var i = 0; i < points.length; i++) {
-      var distance = (points[i] - mouse).distance;
+      var distance = (points[i].point - mouse).distance;
       if (distance < pointRadius) {
         return i;
       }
