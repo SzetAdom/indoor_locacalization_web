@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/map_model.dart';
+import 'package:indoor_localization_web/reset/map_object_model.dart';
 import 'package:indoor_localization_web/reset/map_objects/wall_object.dart';
 import 'package:indoor_localization_web/reset/model/door_model.dart';
 import 'package:indoor_localization_web/reset/model/map_object_point_model.dart';
@@ -32,19 +33,51 @@ class MapEditorController extends ChangeNotifier {
       id: '0',
       name: 'test',
       objects: [
-        WallObject(id: '0', x: 0, y: 0, description: '', points: [
-          WallObjectPointModel(point: const Offset(50, 50), isDoor: false),
-          WallObjectPointModel(point: const Offset(50, 150), isDoor: false),
-          WallObjectPointModel(point: const Offset(150, 150), isDoor: false),
-          WallObjectPointModel(point: const Offset(150, 50), isDoor: false),
-        ], doors: [
-          DoorModel(
-            firstPointIndex: 0,
-            secontPointIndex: 1,
-            distanceToFirstPoint: 20,
-            distanceToSecondPoint: 20,
-          )
-        ]),
+        WallObject(
+            id: '0',
+            name: 'Szoba 1',
+            x: 0,
+            y: 0,
+            description: '',
+            points: [
+              WallObjectPointModel(point: const Offset(50, 50), isDoor: false),
+              WallObjectPointModel(point: const Offset(50, 150), isDoor: false),
+              WallObjectPointModel(
+                  point: const Offset(150, 150), isDoor: false),
+              WallObjectPointModel(point: const Offset(150, 50), isDoor: false),
+            ],
+            doors: [
+              DoorModel(
+                firstPointIndex: 0,
+                secontPointIndex: 1,
+                distanceToFirstPoint: 20,
+                distanceToSecondPoint: 20,
+              )
+            ]),
+        WallObject(
+            id: '1',
+            name: 'Szoba 2',
+            x: 0,
+            y: 0,
+            description: '',
+            points: [
+              WallObjectPointModel(
+                  point: const Offset(250, 250), isDoor: false),
+              WallObjectPointModel(
+                  point: const Offset(250, 350), isDoor: false),
+              WallObjectPointModel(
+                  point: const Offset(350, 350), isDoor: false),
+              WallObjectPointModel(
+                  point: const Offset(350, 250), isDoor: false),
+            ],
+            doors: [
+              DoorModel(
+                firstPointIndex: 0,
+                secontPointIndex: 1,
+                distanceToFirstPoint: 20,
+                distanceToSecondPoint: 20,
+              )
+            ]),
         // WallObject(
         //     id: '1',
         //     color: Colors.green,
@@ -60,6 +93,22 @@ class MapEditorController extends ChangeNotifier {
       ],
     );
     return true;
+  }
+
+  void updateObject(MapObjectModel object) {
+    map.objects[map.objects.indexWhere((element) => element.id == object.id)] =
+        object;
+    notifyListeners();
+  }
+
+  void addObject(MapObjectModel object) {
+    map.objects.add(object);
+    notifyListeners();
+  }
+
+  void removeObject(String id) {
+    map.objects.removeWhere((element) => element.id == id);
+    notifyListeners();
   }
 
   void onTap(Offset offset, {bool deselect = true}) {
@@ -130,11 +179,14 @@ class MapEditorController extends ChangeNotifier {
     onTap(offset, deselect: false);
   }
 
+  MapObjectModel? get selectedObject {
+    if (selectedObjectId == null) return null;
+    return map.objects.firstWhere((element) => element.id == selectedObjectId);
+  }
+
   MapObjectPointModel? get selectedPoint {
     if (selectedObjectId == null || selectedPointIndex == null) return null;
-    return map.objects
-        .firstWhere((element) => element.id == selectedObjectId)
-        .points[selectedPointIndex!];
+    return selectedObject!.points[selectedPointIndex!];
   }
 
   void onPanUpdate(DragUpdateDetails offset) {
