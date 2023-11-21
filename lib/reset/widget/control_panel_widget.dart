@@ -113,7 +113,7 @@ class MapItemListTile extends StatelessWidget {
     return GestureDetector(
         onTap: () {
           context.read<MapEditorController>().selectObject(object.id);
-        },  
+        },
         child: Container(
           decoration: BoxDecoration(
             color: context.watch<MapEditorController>().selectedObjectId ==
@@ -176,26 +176,26 @@ class _MapItemEditorWidgetState extends State<MapItemEditorWidget> {
               height: 10,
             ),
             //points list
-            ListView.builder(
-                shrinkWrap: true,
-                itemCount: widget.object.points.length,
-                itemBuilder: (context, index) {
-                  MapObjectPointModel point = widget.object.points[index];
-                  return PointEditorListItem(
-                    point: point,
-                    onPointChanged: (point) {
-                      context
-                          .read<MapEditorController>()
-                          .updateObject(widget.object);
-                    },
-                    onPointRemoved: (point) {
-                      widget.object.points.remove(point);
-                      context
-                          .read<MapEditorController>()
-                          .updateObject(widget.object);
-                    },
-                  );
-                }),
+            // ListView.builder(
+            //     shrinkWrap: true,
+            //     itemCount: widget.object.points.length,
+            //     itemBuilder: (context, index) {
+            //       MapObjectPointModel point = widget.object.points[index];
+            //       return PointEditorListItem(
+            //         point: point,
+            //         onPointChanged: (point) {
+            //           context
+            //               .read<MapEditorController>()
+            //               .updateObject(widget.object);
+            //         },
+            //         onPointRemoved: (point) {
+            //           widget.object.points.remove(point);
+            //           context
+            //               .read<MapEditorController>()
+            //               .updateObject(widget.object);
+            //         },
+            //       );
+            //     }),
           ],
         ),
       ),
