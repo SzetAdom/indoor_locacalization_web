@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ abstract class MapObjectInterface {
   void draw(Canvas canvas, Size size, {bool selected = false});
   int? isPointUnderMouse(Offset point);
   bool isObjectUnderMouse(Offset point);
+  List<MapObjectPointModel> rotateObject();
 }
 
 class MapObjectModel implements MapObjectInterface {
@@ -22,7 +24,16 @@ class MapObjectModel implements MapObjectInterface {
   Color? color;
   String? icon;
   String? description;
-  List<MapObjectPointModel> points;
+  // List<MapObjectPointModel> points;
+  List<MapObjectPointModel> pointsRaw = [];
+  List<MapObjectPointModel> get points {
+    var res = rotateObject();
+    pointsRaw = res;
+    angle = 0;
+    return pointsRaw;
+  }
+
+  double angle = 0;
 
   MapObjectModel({
     required this.id,
@@ -30,7 +41,7 @@ class MapObjectModel implements MapObjectInterface {
     this.color,
     this.icon,
     this.description,
-    required this.points,
+    required this.pointsRaw,
   });
 
   MapObjectModel copyWith({
@@ -39,7 +50,8 @@ class MapObjectModel implements MapObjectInterface {
     Color? color,
     String? icon,
     String? description,
-    List<MapObjectPointModel>? points,
+    List<MapObjectPointModel>? pointsRaw,
+    double? rotation,
   }) {
     return MapObjectModel(
       id: id ?? this.id,
@@ -47,13 +59,13 @@ class MapObjectModel implements MapObjectInterface {
       color: color ?? this.color,
       icon: icon ?? this.icon,
       description: description ?? this.description,
-      points: points ?? this.points,
+      pointsRaw: pointsRaw ?? this.pointsRaw,
     );
   }
 
   @override
   void addPoint(MapObjectPointModel point) {
-    points.add(point);
+    pointsRaw.add(point);
   }
 
   @override
@@ -70,24 +82,26 @@ class MapObjectModel implements MapObjectInterface {
 
   @override
   void movePointBy(int index, Offset offset) {
-    points[index].point += offset;
+    //calculate in the angle
+    // var rotatedOffset = rotateDeltaOffset(offset);
+    pointsRaw[index].point += offset;
   }
 
   @override
   void moveObjectBy(Offset offset) {
     for (var i = 0; i < points.length; i++) {
-      points[i].point += offset;
+      pointsRaw[i].point += offset;
     }
   }
 
   @override
   void movePointTo(int index, Offset offset) {
-    points[index].point = offset;
+    pointsRaw[index].point = offset;
   }
 
   @override
   void removePoint(MapObjectPointModel point) {
-    points.remove(point);
+    pointsRaw.remove(point);
   }
 
   @override
@@ -104,5 +118,40 @@ class MapObjectModel implements MapObjectInterface {
   @override
   bool isObjectUnderMouse(Offset point) {
     throw UnimplementedError();
+  }
+
+  Offset getCenter() {
+    var center = Offset.zero;
+    for (var i = 0; i < pointsRaw.length; i++) {
+      center += pointsRaw[i].point;
+    }
+    center = center / (pointsRaw.length as double);
+    return center;
+  }
+
+  double get angelInRadian => angle * pi / 180;
+
+  @override
+  List<MapObjectPointModel> rotateObject() {
+    List<MapObjectPointModel> res = [];
+
+    //rotate around center
+    var center = getCenter();
+
+    for (var i = 0; i < pointsRaw.length; i++) {
+      var offset = pointsRaw[i].point;
+      var rotatedPoint = Offset(
+        (offset.dx - center.dx) * cos(angelInRadian) -
+            (offset.dy - center.dy) * sin(angelInRadian) +
+            center.dx,
+        (offset.dx - center.dx) * sin(angelInRadian) +
+            (offset.dy - center.dy) * cos(angelInRadian) +
+            center.dy,
+      );
+
+      res.add(MapObjectPointModel(point: rotatedPoint));
+    }
+
+    return res;
   }
 }

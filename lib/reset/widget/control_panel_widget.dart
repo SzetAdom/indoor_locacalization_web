@@ -48,7 +48,7 @@ class _ControlPanelWidgetState extends State<ControlPanelWidget> {
                     MapObjectModel(
                       id: '',
                       name: '',
-                      points: [],
+                      pointsRaw: [],
                     ))
               ],
             ),
@@ -175,6 +175,16 @@ class _MapItemEditorWidgetState extends State<MapItemEditorWidget> {
             const SizedBox(
               height: 10,
             ),
+            // CustomTextInput(
+            //   initText: widget.object.color?.value.toRadixString(16),
+            //   hintText: 'Color',
+            //   onTextChanged: (value) {
+            //     widget.object.color = Color(int.parse(value, radix: 16));
+            //   },
+            //   onTextSubmitted: () {
+            //     context.read<MapEditorController>().updateObject(widget.object);
+            //   },
+            // ),
             //points list
             // ListView.builder(
             //     shrinkWrap: true,
@@ -196,6 +206,42 @@ class _MapItemEditorWidgetState extends State<MapItemEditorWidget> {
             //         },
             //       );
             //     }),
+
+            //rotating with slider and text input
+            Row(
+              children: [
+                Expanded(
+                  child: Slider(
+                    max: 360,
+                    min: -360,
+                    value: widget.object.angle,
+                    onChanged: (value) {
+                      setState(() {
+                        widget.object.angle = value;
+                      });
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: CustomTextInput(
+                    initText: widget.object.angle.toString(),
+                    hintText: 'Rotation',
+                    onTextChanged: (value) {
+                      // angle in degrees
+                      widget.object.angle = double.parse(value);
+                    },
+                    onTextSubmitted: () {
+                      context
+                          .read<MapEditorController>()
+                          .updateObject(widget.object);
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
           ],
         ),
       ),

@@ -39,7 +39,7 @@ class MapEditorController extends ChangeNotifier {
             x: 0,
             y: 0,
             description: '',
-            points: [
+            pointsRaw: [
               WallObjectPointModel(point: const Offset(50, 50), isDoor: false),
               WallObjectPointModel(point: const Offset(50, 150), isDoor: false),
               WallObjectPointModel(
@@ -60,7 +60,7 @@ class MapEditorController extends ChangeNotifier {
             x: 0,
             y: 0,
             description: '',
-            points: [
+            pointsRaw: [
               WallObjectPointModel(
                   point: const Offset(250, 250), isDoor: false),
               WallObjectPointModel(
@@ -212,9 +212,12 @@ class MapEditorController extends ChangeNotifier {
                 (element) => element.id == selectedObjectId)] //get object
             .moveObjectBy(offset.delta * 1 / zoomLevel); //move point
       } else {
-        map.objects[map.objects.indexWhere(
-                (element) => element.id == selectedObjectId)] //get object
-            .movePointTo(selectedPointIndex!, normalizedOffset); //move point
+        //move point by
+        selectedObject!.movePointBy(selectedPointIndex!, offset.delta);
+
+        // map.objects[map.objects.indexWhere(
+        //         (element) => element.id == selectedObjectId)] //get object
+        //     .movePointTo(selectedPointIndex!, normalizedOffset); //move point
 
         if (selectedPoint!.point.dx > 0 &&
             selectedPoint!.point.dx > map.widthRight) {

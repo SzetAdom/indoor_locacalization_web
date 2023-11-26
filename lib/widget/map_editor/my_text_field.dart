@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class MyTextField extends StatefulWidget {
-  MyTextField(
+  const MyTextField(
       {Key? key,
       required this.title,
       required this.value,
@@ -16,10 +16,10 @@ class MyTextField extends StatefulWidget {
   final String title;
   final String value;
   final Function(String value) onChanged;
-  bool doubleOnly;
-  bool isTextArea;
-  MainAxisAlignment alignment;
-  double? height;
+  final bool doubleOnly;
+  final bool isTextArea;
+  final MainAxisAlignment alignment;
+  final double? height;
 
   @override
   State<MyTextField> createState() => _MyTextFieldState();
