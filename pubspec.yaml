@@ -44,6 +44,8 @@ dependencies:
   go_router: ^10.1.2
   url_strategy: ^0.2.0
   responsive_framework: ^1.1.0
+  json_annotation: ^4.8.1
+  font_awesome_flutter: ^10.6.0
 
 dev_dependencies:
   flutter_test:
@@ -55,6 +57,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.1
+  json_serializable: ^6.7.1
+  build_runner: ^2.4.7
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

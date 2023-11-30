@@ -34,9 +34,7 @@ class _ObjectListWidgetState extends State<ObjectListWidget> {
             onTap: () {
               asyncController.selectObject(index, true);
             },
-            child: Container(
-              child: Text(controller.mapDataModel.objects[index].name),
-            ),
+            child: Text(controller.mapDataModel.objects[index].name),
           ),
         ),
         itemCount: controller.mapDataModel.objects.length,

@@ -163,27 +163,24 @@ class _MapEditorControlPanelState extends State<MapEditorControlPanel> {
                     ],
                   ),
                 ),
-                Container(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: MyTextField(
-                            height: 300,
-                            title: 'Description',
-                            value: controller.selectedMapObject?.description
-                                    .toString() ??
-                                '',
-                            onChanged: (String value) {
-                              if (controller.selectedMapObject != null) {
-                                var newModel = asyncController
-                                    .selectedMapObject!
-                                    .copyWith(description: value);
-                                asyncController.updateSelectedModel(newModel);
-                              }
-                            }),
-                      ),
-                    ],
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: MyTextField(
+                          height: 300,
+                          title: 'Description',
+                          value: controller.selectedMapObject?.description
+                                  .toString() ??
+                              '',
+                          onChanged: (String value) {
+                            if (controller.selectedMapObject != null) {
+                              var newModel = asyncController.selectedMapObject!
+                                  .copyWith(description: value);
+                              asyncController.updateSelectedModel(newModel);
+                            }
+                          }),
+                    ),
+                  ],
                 ),
                 if (controller.selectedIndex != -1)
                   GestureDetector(

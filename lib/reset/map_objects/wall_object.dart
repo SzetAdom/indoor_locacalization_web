@@ -5,14 +5,15 @@ import 'package:indoor_localization_web/reset/map_helper.dart';
 import 'package:indoor_localization_web/reset/map_object_model.dart';
 import 'package:indoor_localization_web/reset/model/door_model.dart';
 import 'package:indoor_localization_web/reset/model/wall_object_point_model.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'wall_object.g.dart';
+
+@JsonSerializable()
 class WallObject extends MapObjectModel {
   WallObject({
     required String id,
     String? name,
-    Color? color,
-    required double x,
-    required double y,
     required String description,
     String? icon,
     List<WallObjectPointModel>? pointsRaw,
@@ -20,13 +21,18 @@ class WallObject extends MapObjectModel {
   }) : super(
           id: id,
           name: name,
-          color: color,
           icon: icon,
           description: description,
           pointsRaw: pointsRaw ?? [],
         );
 
   List<DoorModel> doors = [];
+
+  factory WallObject.fromJson(Map<String, dynamic> json) =>
+      _$WallObjectFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$WallObjectToJson(this);
 
   @override
   void draw(Canvas canvas, Size size, {bool selected = false}) {
@@ -63,7 +69,7 @@ class WallObject extends MapObjectModel {
     path.close();
 
     final fillPaint = Paint()
-      ..color = color?.withOpacity(0.1) ?? Colors.black.withOpacity(0.1)
+      ..color = Colors.black.withOpacity(0.1)
       ..strokeWidth = 1
       ..style = PaintingStyle.fill;
 
@@ -176,7 +182,7 @@ class WallObject extends MapObjectModel {
     }
 
     final drawPaint = Paint()
-      ..color = color ?? Colors.black
+      ..color = Colors.black
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
 

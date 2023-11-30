@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -31,7 +32,9 @@ Future<User?> registerWithEmailPassword(String email, String password) async {
       log('An account already exists for that email.');
     }
   } catch (e) {
-    print(e);
+    if (kDebugMode) {
+      print(e);
+    }
   }
 
   return user;

@@ -298,6 +298,7 @@ class _CreateMapState extends State<CreateMap> {
                                         ''
                                   });
 
+                                  // ignore: use_build_context_synchronously
                                   Navigator.pushNamed(context, '/map-editor',
                                       arguments: res.id);
                                 }

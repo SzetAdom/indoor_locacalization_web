@@ -1,4 +1,5 @@
 import 'dart:developer';
+// ignore: avoid_web_libraries_in_flutter
 import 'dart:html';
 
 import 'package:flutter/gestures.dart';
@@ -28,7 +29,6 @@ class _MapEditorPageOldState extends State<MapEditorPageOld> {
 
   @override
   void initState() {
-    // TODO: implement initState
     log('initState');
     controller = MapObjectEditorController();
     controller.addListener(() {
@@ -91,9 +91,7 @@ class _MapEditorPageOldState extends State<MapEditorPageOld> {
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (!snapshot.hasData ||
                       (snapshot.hasData && snapshot.data == false)) {
-                    return Container(
-                      child: const Text('Hiba történt betöltés közben'),
-                    );
+                    return const Text('Hiba történt betöltés közben');
                   }
 
                   return Row(
@@ -116,84 +114,81 @@ class _MapEditorPageOldState extends State<MapEditorPageOld> {
                               notifier.value++;
                             }
                           },
-                          child: Container(
-                            child: Stack(
-                              children: [
-                                LayoutBuilder(
-                                  builder: (ctx, constraints) {
-                                    return MatrixGestureDetector(
-                                      shouldRotate: false,
-                                      shouldScale: false,
-                                      shouldTranslate: value.mapSelected,
-                                      onMatrixUpdate: (m, tm, sm, rm) {
-                                        matrix = MatrixGestureDetector.compose(
-                                            matrix, tm, sm, null);
+                          child: Stack(
+                            children: [
+                              LayoutBuilder(
+                                builder: (ctx, constraints) {
+                                  return MatrixGestureDetector(
+                                    shouldRotate: false,
+                                    shouldScale: false,
+                                    shouldTranslate: value.mapSelected,
+                                    onMatrixUpdate: (m, tm, sm, rm) {
+                                      matrix = MatrixGestureDetector.compose(
+                                          matrix, tm, sm, null);
 
-                                        notifier.value++;
+                                      notifier.value++;
+                                    },
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        controller.selectObject(-1, true);
                                       },
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          controller.selectObject(-1, true);
-                                        },
-                                        child: Container(
-                                          width: double.infinity,
-                                          height: double.infinity,
-                                          alignment: Alignment.topLeft,
-                                          color: const Color(0xff444444),
-                                          child: AnimatedBuilder(
-                                            animation: notifier,
-                                            builder: (ctx, child) {
-                                              return Transform(
-                                                transform: matrix,
-                                                child: OverflowBox(
-                                                  minHeight: 0,
-                                                  minWidth: 0,
-                                                  maxHeight: double.infinity,
-                                                  maxWidth: double.infinity,
+                                      child: Container(
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                        alignment: Alignment.topLeft,
+                                        color: const Color(0xff444444),
+                                        child: AnimatedBuilder(
+                                          animation: notifier,
+                                          builder: (ctx, child) {
+                                            return Transform(
+                                              transform: matrix,
+                                              child: OverflowBox(
+                                                minHeight: 0,
+                                                minWidth: 0,
+                                                maxHeight: double.infinity,
+                                                maxWidth: double.infinity,
+                                                child: Container(
+                                                  width: controller
+                                                      .mapDataModel.width,
+                                                  height: controller
+                                                      .mapDataModel.height,
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                    color: Colors.white,
+                                                  ),
                                                   child: Container(
-                                                    width: controller
-                                                        .mapDataModel.width,
-                                                    height: controller
-                                                        .mapDataModel.height,
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                      color: Colors.white,
-                                                    ),
-                                                    child: Container(
-                                                      color:
-                                                          Colors.grey.shade200,
-                                                      child: GridPaper(
-                                                        color: Colors.black,
-                                                        child: Stack(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          children: [
-                                                            for (int i = 0;
-                                                                i <
-                                                                    controller
-                                                                        .mapDataModel
-                                                                        .objects
-                                                                        .length;
-                                                                i++)
-                                                              controller
-                                                                  .getEditWidget(
-                                                                      i)
-                                                          ],
-                                                        ),
+                                                    color: Colors.grey.shade200,
+                                                    child: GridPaper(
+                                                      color: Colors.black,
+                                                      child: Stack(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        children: [
+                                                          for (int i = 0;
+                                                              i <
+                                                                  controller
+                                                                      .mapDataModel
+                                                                      .objects
+                                                                      .length;
+                                                              i++)
+                                                            controller
+                                                                .getEditWidget(
+                                                                    i)
+                                                        ],
                                                       ),
                                                     ),
                                                   ),
                                                 ),
-                                              );
-                                            },
-                                          ),
+                                              ),
+                                            );
+                                          },
                                         ),
                                       ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -204,11 +199,10 @@ class _MapEditorPageOldState extends State<MapEditorPageOld> {
                           const SizedBox(
                               height: 400, child: ObjectListWidget()),
                           GestureDetector(
-                            child: Container(
-                                child: const Text(
+                            child: const Text(
                               'Add object',
                               style: TextStyle(color: Colors.white),
-                            )),
+                            ),
                           ),
                           IconButton(
                               color: Colors.white,

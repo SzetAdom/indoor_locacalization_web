@@ -137,113 +137,105 @@ class MapItemEditorWidget extends StatefulWidget {
 
 class _MapItemEditorWidgetState extends State<MapItemEditorWidget> {
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Container(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            CustomTextInput(
-              initText: widget.object.name,
-              hintText: 'Name',
-              onTextChanged: (value) {
-                widget.object.name = value;
-              },
-              onTextSubmitted: () {
-                context.read<MapEditorController>().updateObject(widget.object);
-              },
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            CustomTextInput(
-              initText: widget.object.description,
-              hintText: 'Description',
-              multiline: true,
-              onTextChanged: (value) {
-                widget.object.description = value;
-              },
-              onTextSubmitted: () {
-                context.read<MapEditorController>().updateObject(widget.object);
-              },
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            // CustomTextInput(
-            //   initText: widget.object.color?.value.toRadixString(16),
-            //   hintText: 'Color',
-            //   onTextChanged: (value) {
-            //     widget.object.color = Color(int.parse(value, radix: 16));
-            //   },
-            //   onTextSubmitted: () {
-            //     context.read<MapEditorController>().updateObject(widget.object);
-            //   },
-            // ),
-            //points list
-            // ListView.builder(
-            //     shrinkWrap: true,
-            //     itemCount: widget.object.points.length,
-            //     itemBuilder: (context, index) {
-            //       MapObjectPointModel point = widget.object.points[index];
-            //       return PointEditorListItem(
-            //         point: point,
-            //         onPointChanged: (point) {
-            //           context
-            //               .read<MapEditorController>()
-            //               .updateObject(widget.object);
-            //         },
-            //         onPointRemoved: (point) {
-            //           widget.object.points.remove(point);
-            //           context
-            //               .read<MapEditorController>()
-            //               .updateObject(widget.object);
-            //         },
-            //       );
-            //     }),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          CustomTextInput(
+            initText: widget.object.name,
+            hintText: 'Name',
+            onTextChanged: (value) {
+              widget.object.name = value;
+            },
+            onTextSubmitted: () {
+              context.read<MapEditorController>().updateObject(widget.object);
+            },
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          CustomTextInput(
+            initText: widget.object.description,
+            hintText: 'Description',
+            multiline: true,
+            onTextChanged: (value) {
+              widget.object.description = value;
+            },
+            onTextSubmitted: () {
+              context.read<MapEditorController>().updateObject(widget.object);
+            },
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          // CustomTextInput(
+          //   initText: widget.object.color?.value.toRadixString(16),
+          //   hintText: 'Color',
+          //   onTextChanged: (value) {
+          //     widget.object.color = Color(int.parse(value, radix: 16));
+          //   },
+          //   onTextSubmitted: () {
+          //     context.read<MapEditorController>().updateObject(widget.object);
+          //   },
+          // ),
+          //points list
+          // ListView.builder(
+          //     shrinkWrap: true,
+          //     itemCount: widget.object.points.length,
+          //     itemBuilder: (context, index) {
+          //       MapObjectPointModel point = widget.object.points[index];
+          //       return PointEditorListItem(
+          //         point: point,
+          //         onPointChanged: (point) {
+          //           context
+          //               .read<MapEditorController>()
+          //               .updateObject(widget.object);
+          //         },
+          //         onPointRemoved: (point) {
+          //           widget.object.points.remove(point);
+          //           context
+          //               .read<MapEditorController>()
+          //               .updateObject(widget.object);
+          //         },
+          //       );
+          //     }),
 
-            //rotating with slider and text input
-            Row(
-              children: [
-                Expanded(
-                  child: Slider(
-                    max: 360,
-                    min: -360,
-                    value: widget.object.angle,
-                    onChanged: (value) {
-                      setState(() {
-                        widget.object.angle = value;
-                      });
-                    },
-                  ),
+          //rotating with slider and text input
+          Row(
+            children: [
+              Expanded(
+                child: Slider(
+                  max: 360,
+                  min: -360,
+                  value: widget.object.angle,
+                  onChanged: (value) {
+                    setState(() {
+                      widget.object.angle = value;
+                    });
+                  },
                 ),
-                Expanded(
-                  child: CustomTextInput(
-                    initText: widget.object.angle.toString(),
-                    hintText: 'Rotation',
-                    onTextChanged: (value) {
-                      // angle in degrees
-                      widget.object.angle = double.parse(value);
-                    },
-                    onTextSubmitted: () {
-                      context
-                          .read<MapEditorController>()
-                          .updateObject(widget.object);
-                    },
-                  ),
+              ),
+              Expanded(
+                child: CustomTextInput(
+                  initText: widget.object.angle.toString(),
+                  hintText: 'Rotation',
+                  onTextChanged: (value) {
+                    // angle in degrees
+                    widget.object.angle = double.parse(value);
+                  },
+                  onTextSubmitted: () {
+                    context
+                        .read<MapEditorController>()
+                        .updateObject(widget.object);
+                  },
                 ),
-              ],
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+        ],
       ),
     );
   }

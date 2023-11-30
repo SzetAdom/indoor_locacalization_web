@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:indoor_localization_web/reset/map_editor_controller.dart';
 import 'package:indoor_localization_web/reset/map_editor_painer.dart';
 import 'package:indoor_localization_web/reset/widget/control_panel_widget.dart';
@@ -27,7 +28,7 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
   void initState() {
     super.initState();
     controller = MapEditorController();
-    future = controller.loadMap(widget.mapId);
+    future = controller.loadMap();
     ServicesBinding.instance.keyboard.addHandler(_onKey);
   }
 
@@ -102,6 +103,20 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
             elevation: 10,
             actions: [
               IconButton(
+                  onPressed: () async {
+                    String data = await controller.openFile();
+                    controller.setMap(data);
+                  },
+                  icon: const Icon(
+                    FontAwesomeIcons.fileImport,
+                  )),
+              IconButton(
+                onPressed: () {
+                  controller.export();
+                },
+                icon: const Icon(Icons.save),
+              ),
+              IconButton(
                 onPressed: () {
                   // controller.save();
                 },
@@ -127,9 +142,7 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (!snapshot.hasData ||
                       (snapshot.hasData && snapshot.data == false)) {
-                    return Container(
-                      child: const Text('Hiba történt betöltés közben'),
-                    );
+                    return const Text('Hiba történt betöltés közben');
                   }
 
                   return Listener(

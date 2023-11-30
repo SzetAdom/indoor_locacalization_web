@@ -17,6 +17,20 @@ class DoorModel {
     required this.distanceToSecondPoint,
   });
 
+  factory DoorModel.fromJson(Map<String, dynamic> json) => DoorModel(
+        firstPointIndex: json['firstPointIndex'],
+        secontPointIndex: json['secontPointIndex'],
+        distanceToFirstPoint: json['distanceToFirstPoint'],
+        distanceToSecondPoint: json['distanceToSecondPoint'],
+      );
+
+  Map<String, dynamic> toJson() => {
+        'firstPointIndex': firstPointIndex,
+        'secontPointIndex': secontPointIndex,
+        'distanceToFirstPoint': distanceToFirstPoint,
+        'distanceToSecondPoint': distanceToSecondPoint,
+      };
+
   Offset getFirstPointOffset(Offset firstPoint, Offset secondPoint) {
     final firstPointDirection = MapHelper.direction(
       firstPoint,

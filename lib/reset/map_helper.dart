@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
+
 class MapHelper {
   static bool polyContains(
       int nvert, List<double> vertx, List<double> verty, Offset test) {
@@ -21,7 +23,9 @@ class MapHelper {
         j++;
       }
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
 
     return c == 1;

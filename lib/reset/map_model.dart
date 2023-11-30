@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/map_object_model.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'map_model.g.dart';
+
+@JsonSerializable()
 class MapModel {
   String id;
   String name;
@@ -17,18 +21,13 @@ class MapModel {
     this.extraHeightBottom = 100,
   });
 
-  // factory MapModel.fromJson(Map<String, dynamic> json) {
-  //   return MapModel(
-  //     id: json['id'],
-  //     name: json['name'],
-  //     points: json['points']
-  //         .map<MapPointModel>((point) => MapPointModel.fromJson(point))
-  //         .toList(),
-  //   );
-  // }
+  factory MapModel.fromJson(Map<String, dynamic> json) =>
+      _$MapModelFromJson(json);
 
-  double baseWidth = 500;
-  double baseHeight = 500;
+  Map<String, dynamic> toJson() => _$MapModelToJson(this);
+
+  double baseWidth = 1000;
+  double baseHeight = 1000;
 
   Size get baseSize => Size(baseWidth, baseHeight);
 

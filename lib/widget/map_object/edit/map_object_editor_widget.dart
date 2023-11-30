@@ -57,11 +57,6 @@ class _MapObjectEditorWidgetState extends State<MapObjectEditorWidget>
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     mapObjectDataModel = widget.mapObjectModel.data;
     return MatrixGestureDetector(

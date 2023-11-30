@@ -1,3 +1,8 @@
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:convert';
+import 'dart:html';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/map_model.dart';
 import 'package:indoor_localization_web/reset/map_object_model.dart';
@@ -20,79 +25,124 @@ class MapEditorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void save() {}
-
-  void undo() {}
-
-  void redo() {}
-
   late MapModel map;
 
-  Future<bool> loadMap(String mapId) async {
-    map = MapModel(
-      id: '0',
-      name: 'test',
-      objects: [
-        WallObject(
-            id: '0',
-            name: 'Szoba 1',
-            x: 0,
-            y: 0,
-            description: '',
-            pointsRaw: [
-              WallObjectPointModel(point: const Offset(50, 50), isDoor: false),
-              WallObjectPointModel(point: const Offset(50, 150), isDoor: false),
-              WallObjectPointModel(
-                  point: const Offset(150, 150), isDoor: false),
-              WallObjectPointModel(point: const Offset(150, 50), isDoor: false),
-            ],
-            doors: [
-              DoorModel(
-                firstPointIndex: 0,
-                secontPointIndex: 1,
-                distanceToFirstPoint: 20,
-                distanceToSecondPoint: 20,
-              )
-            ]),
-        WallObject(
-            id: '1',
-            name: 'Szoba 2',
-            x: 0,
-            y: 0,
-            description: '',
-            pointsRaw: [
-              WallObjectPointModel(
-                  point: const Offset(250, 250), isDoor: false),
-              WallObjectPointModel(
-                  point: const Offset(250, 350), isDoor: false),
-              WallObjectPointModel(
-                  point: const Offset(350, 350), isDoor: false),
-              WallObjectPointModel(
-                  point: const Offset(350, 250), isDoor: false),
-            ],
-            doors: [
-              DoorModel(
-                firstPointIndex: 0,
-                secontPointIndex: 1,
-                distanceToFirstPoint: 20,
-                distanceToSecondPoint: 20,
-              )
-            ]),
-        // WallObject(
-        //     id: '1',
-        //     color: Colors.green,
-        //     x: 0,
-        //     y: 0,
-        //     description: '',
-        //     points: [
-        //       const Offset(0, 0),
-        //       const Offset(0, 100),
-        //       const Offset(100, 100),
-        //       const Offset(100, 0),
-        //     ]),
-      ],
-    );
+  Future<bool> loadMap() async {
+    // var json = await openFile();
+    // setMap(json);
+    map = MapModel(id: '0', name: 'test', objects: []);
+
+    for (int i = 0; i < 1; i++) {
+      map.objects.addAll(
+        [
+          WallObject(id: '${i}_0.0', name: 'Alap', description: '', pointsRaw: [
+            WallObjectPointModel(point: const Offset(-580, -0)),
+            WallObjectPointModel(point: const Offset(-580, 535)),
+            WallObjectPointModel(point: const Offset(115, 250)),
+            WallObjectPointModel(point: const Offset(100, 0)),
+          ], doors: const []),
+          WallObject(
+              id: '${i}_1.0',
+              name: 'Hálószoba',
+              description: '',
+              pointsRaw: [
+                WallObjectPointModel(point: const Offset(0, 0)),
+                WallObjectPointModel(point: const Offset(-380, 0)),
+                WallObjectPointModel(point: const Offset(-380, -270)),
+                WallObjectPointModel(point: const Offset(0, -270)),
+              ],
+              doors: [
+                DoorModel(
+                  firstPointIndex: 0,
+                  secontPointIndex: 1,
+                  distanceToFirstPoint: 86,
+                  distanceToSecondPoint: 204,
+                )
+              ]),
+          WallObject(id: '${i}_1.1', name: 'Ágy', description: '', pointsRaw: [
+            WallObjectPointModel(point: const Offset(-160, -270)),
+            WallObjectPointModel(point: const Offset(-160, -65)),
+            WallObjectPointModel(point: const Offset(-345, -65)),
+            WallObjectPointModel(point: const Offset(-345, -270)),
+          ], doors: const []),
+          WallObject(
+              id: '${i}_1.2',
+              name: 'Szekrény',
+              description: '',
+              pointsRaw: [
+                WallObjectPointModel(point: const Offset(-0, -270)),
+                WallObjectPointModel(point: const Offset(-0, -65)),
+                WallObjectPointModel(point: const Offset(-50, -65)),
+                WallObjectPointModel(point: const Offset(-50, -270)),
+              ],
+              doors: const []),
+          WallObject(
+              id: '${i}_2.0',
+              name: 'Fürdőszoba',
+              description: '',
+              pointsRaw: [
+                WallObjectPointModel(point: const Offset(115, 250)),
+                WallObjectPointModel(point: const Offset(305, 250)),
+                WallObjectPointModel(point: const Offset(305, 0)),
+                WallObjectPointModel(point: const Offset(100, 0)),
+              ],
+              doors: const []),
+          WallObject(
+              id: '${i}_3.0',
+              name: 'Tároló',
+              description: '',
+              pointsRaw: [
+                WallObjectPointModel(point: const Offset(115, 250)),
+                WallObjectPointModel(point: const Offset(7, 254)),
+              ],
+              doors: const []),
+        ],
+      );
+    }
     return true;
+  }
+
+  void export() {
+    if (kDebugMode) {
+      print(map.toJson());
+    }
+
+    var json = jsonEncode(map.toJson());
+
+    var blob = Blob([json], 'application/json');
+
+    var url = Url.createObjectUrl(blob);
+
+    var anchor = AnchorElement()
+      ..href = url
+      ..download = '${map.name}.json';
+
+    anchor.click();
+
+    Url.revokeObjectUrl(url);
+  }
+
+  Future<String> openFile() async {
+    var input = FileUploadInputElement();
+    input.accept = '.json';
+    input.click();
+
+    await input.onChange.first;
+
+    var file = input.files!.first;
+
+    var reader = FileReader();
+    reader.readAsText(file);
+
+    await reader.onLoad.first;
+
+    return reader.result as String;
+  }
+
+  void setMap(String json) {
+    var mapModel = MapModel.fromJson(jsonDecode(json));
+    map = mapModel;
+    notifyListeners();
   }
 
   void updateObject(MapObjectModel object) {
@@ -134,7 +184,9 @@ class MapEditorController extends ChangeNotifier {
             }
           }
         } catch (e) {
-          print(e);
+          if (kDebugMode) {
+            print(e);
+          }
         }
       }
       if (deselect) {

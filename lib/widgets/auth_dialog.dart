@@ -190,7 +190,7 @@ class _AuthDialogState extends State<AuthDialog> {
                           margin: const EdgeInsets.only(right: 10),
                           child: TextButton(
                             style: TextButton.styleFrom(
-                              primary: Colors.blueGrey.shade800,
+                              foregroundColor: Colors.blueGrey.shade800,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
                               ),
@@ -259,7 +259,7 @@ class _AuthDialogState extends State<AuthDialog> {
                           margin: const EdgeInsets.only(left: 10),
                           child: TextButton(
                             style: TextButton.styleFrom(
-                              primary: Colors.blueGrey.shade800,
+                              foregroundColor: Colors.blueGrey.shade800,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
                               ),
