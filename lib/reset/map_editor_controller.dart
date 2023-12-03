@@ -41,8 +41,10 @@ class MapEditorController extends ChangeNotifier {
           point: const Offset(-500, 50), id: '12', name: 'Íróasztal 1'),
       TestPointModel(
           point: const Offset(-350, 200), id: '13', name: 'Íróasztal 2'),
-      TestPointModel(point: const Offset(-500, 150), id: '14', name: 'Nappali'),
-      TestPointModel(point: const Offset(-500, 400), id: '15', name: 'Nappali'),
+      TestPointModel(
+          point: const Offset(-500, 150), id: '14', name: 'Nappali 1'),
+      TestPointModel(
+          point: const Offset(-500, 400), id: '15', name: 'Nappali 2'),
     ];
 
     map.beacons = [
