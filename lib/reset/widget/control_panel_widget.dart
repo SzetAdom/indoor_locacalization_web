@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/map_editor_controller.dart';
 import 'package:indoor_localization_web/reset/map_objects/map_object_model.dart';
+import 'package:indoor_localization_web/reset/map_objects/wall_object.dart';
 import 'package:indoor_localization_web/reset/model/map_object_point_model.dart';
 import 'package:indoor_localization_web/reset/widget/custom_text_input.dart';
 import 'package:provider/provider.dart';
@@ -45,11 +46,12 @@ class _ControlPanelWidgetState extends State<ControlPanelWidget> {
                   height: 10,
                 ),
                 MapItemEditorWidget(controller.selectedObject ??
-                    MapObjectModel(
-                      id: '',
-                      name: '',
-                      pointsRaw: [],
-                    ))
+                    WallObject(
+                        id: '',
+                        description: '',
+                        name: '',
+                        pointsRaw: [],
+                        doors: []))
               ],
             ),
           )),
@@ -129,7 +131,7 @@ class MapItemListTile extends StatelessWidget {
 class MapItemEditorWidget extends StatefulWidget {
   const MapItemEditorWidget(this.object, {Key? key}) : super(key: key);
 
-  final MapObjectModel object;
+  final WallObject object;
 
   @override
   State<MapItemEditorWidget> createState() => _MapItemEditorWidgetState();

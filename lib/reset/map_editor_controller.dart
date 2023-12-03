@@ -4,43 +4,73 @@ import 'dart:html';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:indoor_localization_web/reset/model/map_model.dart';
-import 'package:indoor_localization_web/reset/map_objects/map_object_model.dart';
-import 'package:indoor_localization_web/reset/map_objects/wall_object.dart';
 import 'package:indoor_localization_web/reset/map_objects/door_model.dart';
-import 'package:indoor_localization_web/reset/model/map_object_point_model.dart';
+import 'package:indoor_localization_web/reset/map_objects/wall_object.dart';
 import 'package:indoor_localization_web/reset/map_objects/wall_object_point_model.dart';
-
-enum EditMode {
-  select,
-  move,
-  resize,
-}
+import 'package:indoor_localization_web/reset/model/map_beacon_model.dart';
+import 'package:indoor_localization_web/reset/model/map_model.dart';
+import 'package:indoor_localization_web/reset/model/map_object_point_model.dart';
+import 'package:indoor_localization_web/reset/model/test_point_model.dart';
 
 class MapEditorController extends ChangeNotifier {
-  EditMode editMode = EditMode.select;
-
-  void setEditMode(EditMode mode) {
-    editMode = mode;
-    notifyListeners();
-  }
-
   late MapModel map;
 
   Future<bool> loadMap() async {
-    // var json = await openFile();
-    // setMap(json);
     map = MapModel(id: '0', name: 'test', objects: []);
+
+    map.testPoints = [
+      TestPointModel(point: const Offset(0, 0), id: '0', name: 'Origó'),
+      TestPointModel(point: const Offset(0, 100), id: '1', name: 'Ajtó előtt'),
+      TestPointModel(
+          point: const Offset(100, 100), id: '2', name: 'Fürdőszoba ajtó'),
+      TestPointModel(
+          point: const Offset(200, 100), id: '3', name: 'Fürdőszoba'),
+      TestPointModel(point: const Offset(100, 200), id: '4', name: 'Tároló'),
+      TestPointModel(
+          point: const Offset(-100, 100), id: '5', name: 'Háló előtt'),
+      TestPointModel(point: const Offset(-100, 0), id: '6', name: 'Háló ajtó'),
+      TestPointModel(point: const Offset(-100, -100), id: '7', name: 'Háló'),
+      TestPointModel(point: const Offset(-200, 100), id: '8', name: 'Nappali'),
+      TestPointModel(
+          point: const Offset(-200, 200), id: '9', name: 'Konyhapult'),
+      TestPointModel(
+          point: const Offset(-200, 300), id: '10', name: 'Konyha 1'),
+      TestPointModel(
+          point: const Offset(-100, 300), id: '11', name: 'Konyha 2'),
+      TestPointModel(
+          point: const Offset(-500, 50), id: '12', name: 'Íróasztal 1'),
+      TestPointModel(
+          point: const Offset(-350, 200), id: '13', name: 'Íróasztal 2'),
+      TestPointModel(point: const Offset(-500, 150), id: '14', name: 'Nappali'),
+      TestPointModel(point: const Offset(-500, 400), id: '15', name: 'Nappali'),
+    ];
+
+    map.beacons = [
+      MapBeaconModel(
+          point: const Offset(250, 100),
+          uuid: 'B9407F30-F5F8-466E-AFF9-25556B57FEEA'),
+      MapBeaconModel(
+          point: const Offset(-35, -170),
+          uuid: 'B9407F30-F5F8-466E-AFF9-25556B57FEEB'),
+      MapBeaconModel(
+          point: const Offset(-500, 500),
+          uuid: 'B9407F30-F5F8-466E-AFF9-25556B57FEEC'),
+    ];
 
     for (int i = 0; i < 1; i++) {
       map.objects.addAll(
         [
-          WallObject(id: '${i}_0.0', name: 'Alap', description: '', pointsRaw: [
-            WallObjectPointModel(point: const Offset(-580, -0)),
-            WallObjectPointModel(point: const Offset(-580, 535)),
-            WallObjectPointModel(point: const Offset(115, 250)),
-            WallObjectPointModel(point: const Offset(100, 0)),
-          ], doors: const []),
+          WallObject(
+              id: '${i}_0.0',
+              name: 'Nappali',
+              description: '',
+              pointsRaw: [
+                WallObjectPointModel(point: const Offset(-580, -0)),
+                WallObjectPointModel(point: const Offset(-580, 535)),
+                WallObjectPointModel(point: const Offset(115, 250)),
+                WallObjectPointModel(point: const Offset(100, 0)),
+              ],
+              doors: const []),
           WallObject(
               id: '${i}_1.0',
               name: 'Hálószoba',
@@ -93,7 +123,53 @@ class MapEditorController extends ChangeNotifier {
               description: '',
               pointsRaw: [
                 WallObjectPointModel(point: const Offset(115, 250)),
-                WallObjectPointModel(point: const Offset(7, 254)),
+                WallObjectPointModel(point: const Offset(110, 172)),
+                WallObjectPointModel(point: const Offset(-55, 175)),
+                WallObjectPointModel(point: const Offset(-63, 323)),
+              ],
+              doors: const []),
+          WallObject(
+              id: '${i}_4.0',
+              name: 'Konyhapult',
+              description: '',
+              pointsRaw: [
+                WallObjectPointModel(point: const Offset(-180, 225)),
+                WallObjectPointModel(point: const Offset(-180, 175)),
+                WallObjectPointModel(point: const Offset(-55, 175)),
+                WallObjectPointModel(point: const Offset(-60, 225)),
+              ],
+              doors: const []),
+          WallObject(
+              id: '${i}_5.0',
+              name: 'Íróasztal 1',
+              description: '',
+              pointsRaw: [
+                WallObjectPointModel(point: const Offset(-580, 100)),
+                WallObjectPointModel(point: const Offset(-580, 40)),
+                WallObjectPointModel(point: const Offset(-455, 40)),
+                WallObjectPointModel(point: const Offset(-455, 100)),
+              ],
+              doors: const []),
+          WallObject(
+              id: '${i}_5.1',
+              name: 'Íróasztal 2',
+              description: '',
+              pointsRaw: [
+                WallObjectPointModel(point: const Offset(-580, 160)),
+                WallObjectPointModel(point: const Offset(-580, 100)),
+                WallObjectPointModel(point: const Offset(-455, 100)),
+                WallObjectPointModel(point: const Offset(-455, 160)),
+              ],
+              doors: const []),
+          WallObject(
+              id: '${i}_5.2',
+              name: 'Kanapé',
+              description: '',
+              pointsRaw: [
+                WallObjectPointModel(point: const Offset(-580, 400)),
+                WallObjectPointModel(point: const Offset(-580, 200)),
+                WallObjectPointModel(point: const Offset(-500, 200)),
+                WallObjectPointModel(point: const Offset(-500, 400)),
               ],
               doors: const []),
         ],
@@ -145,13 +221,13 @@ class MapEditorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateObject(MapObjectModel object) {
+  void updateObject(WallObject object) {
     map.objects[map.objects.indexWhere((element) => element.id == object.id)] =
         object;
     notifyListeners();
   }
 
-  void addObject(MapObjectModel object) {
+  void addObject(WallObject object) {
     map.objects.add(object);
     notifyListeners();
   }
@@ -231,7 +307,7 @@ class MapEditorController extends ChangeNotifier {
     onTap(offset, deselect: false);
   }
 
-  MapObjectModel? get selectedObject {
+  WallObject? get selectedObject {
     if (selectedObjectId == null) return null;
     return map.objects.firstWhere((element) => element.id == selectedObjectId);
   }

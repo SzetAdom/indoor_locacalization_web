@@ -64,7 +64,7 @@ class MapObjectModel implements MapObjectInterface {
               .map((e) =>
                   MapObjectPointModel.fromJson(e as Map<String, dynamic>))
               .toList(),
-        );                                                                                                                                                                                                                                                                                                                                                                                                                             
+        );
     }
   }
 
@@ -141,7 +141,6 @@ class MapObjectModel implements MapObjectInterface {
     }
     path.close();
     return path.contains(point);
-    return false;
   }
 
   Offset getCenter() {

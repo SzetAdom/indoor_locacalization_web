@@ -59,39 +59,6 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
     }
   }
 
-  Widget get toolBar {
-    return Row(
-      children: [
-        //select tool
-        IconButton(
-            onPressed: () {
-              controller.setEditMode(EditMode.select);
-            },
-            icon: Icon(
-              Icons.highlight_alt,
-              color: controller.editMode == EditMode.select
-                  ? Colors.black
-                  : Colors.grey,
-            )),
-
-        //add object tool
-
-        //move tool
-        IconButton(
-            onPressed: () {
-              controller.setEditMode(EditMode.move);
-            },
-            icon: Icon(
-              Icons.pan_tool,
-              color: controller.editMode == EditMode.move
-                  ? Colors.black
-                  : Colors.grey,
-            )),
-        //add point tool
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<MapEditorController>(
@@ -99,7 +66,6 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
       child: Consumer<MapEditorController>(builder: (context, value, child) {
         return Scaffold(
           appBar: AppBar(
-            title: toolBar,
             elevation: 10,
             actions: [
               IconButton(
@@ -115,24 +81,6 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
                   controller.export();
                 },
                 icon: const Icon(Icons.save),
-              ),
-              IconButton(
-                onPressed: () {
-                  // controller.save();
-                },
-                icon: const Icon(Icons.save),
-              ),
-              IconButton(
-                onPressed: () {
-                  // controller.undo();
-                },
-                icon: const Icon(Icons.undo),
-              ),
-              IconButton(
-                onPressed: () {
-                  // controller.redo();
-                },
-                icon: const Icon(Icons.redo),
               ),
             ],
           ),

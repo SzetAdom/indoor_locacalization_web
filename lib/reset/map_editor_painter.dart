@@ -264,5 +264,17 @@ class MapEditorPainter extends CustomPainter {
     for (final mapObject in map.objects) {
       mapObject.draw(canvas, size, selected: mapObject.id == selectedPointId);
     }
+    for (final mapBeacon in map.beacons) {
+      mapBeacon.draw(
+        canvas,
+        size,
+      );
+    }
+    for (final testPoint in map.testPoints) {
+      testPoint.draw(
+        canvas,
+        size,
+      );
+    }
   }
 }

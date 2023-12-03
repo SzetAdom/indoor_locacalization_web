@@ -2,10 +2,9 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/map_helper.dart';
-import 'package:indoor_localization_web/reset/map_objects/map_object_model.dart';
 import 'package:indoor_localization_web/reset/map_objects/door_model.dart';
+import 'package:indoor_localization_web/reset/map_objects/map_object_model.dart';
 import 'package:indoor_localization_web/reset/map_objects/wall_object_point_model.dart';
-import 'package:json_annotation/json_annotation.dart';
 
 class WallObject extends MapObjectModel {
   WallObject({
@@ -102,7 +101,6 @@ class WallObject extends MapObjectModel {
         PointMode.points, points.map((e) => e.point).toList(), paint);
 
     //write the point index
-
     const textStyle = TextStyle(
       color: Colors.black,
       fontSize: 20,
@@ -115,7 +113,7 @@ class WallObject extends MapObjectModel {
 
     for (var i = 0; i < points.length; i++) {
       textPainter.text = TextSpan(
-        text: '$i',
+        text: '$i(${points[i].point.dx},${points[i].point.dy})',
         style: textStyle,
       );
 

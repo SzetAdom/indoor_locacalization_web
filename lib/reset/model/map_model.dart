@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:indoor_localization_web/reset/map_objects/map_object_model.dart';
-import 'package:json_annotation/json_annotation.dart';
+import 'package:indoor_localization_web/reset/map_objects/wall_object.dart';
+import 'package:indoor_localization_web/reset/model/map_beacon_model.dart';
+import 'package:indoor_localization_web/reset/model/test_point_model.dart';
 
 class MapModel {
   String id;
   String name;
 
-  List<MapObjectModel> objects;
+  List<WallObject> objects;
+  List<TestPointModel> testPoints;
+  List<MapBeaconModel> beacons;
 
   MapModel({
     required this.id,
@@ -16,12 +19,28 @@ class MapModel {
     this.extraWidthLeft = 100,
     this.extraHeightTop = 100,
     this.extraHeightBottom = 100,
+    this.testPoints = const [],
+    this.beacons = const [],
   });
 
   factory MapModel.fromJson(Map<String, dynamic> json) {
     var objects = json['objects'] as List;
-    List<MapObjectModel> objectsList =
-        objects.map((e) => MapObjectModel.fromJson(e)).toList();
+    List<WallObject> objectsList =
+        objects.map((e) => WallObject.fromJson(e)).toList();
+
+    List<TestPointModel> testPoints = [];
+    if (json['testPoints'] != null) {
+      var testPointsJson = json['testPoints'] as List;
+      testPoints =
+          testPointsJson.map((e) => TestPointModel.fromJson(e)).toList();
+    }
+
+    List<MapBeaconModel> beacons = [];
+    if (json['beacons'] != null) {
+      var beaconsJson = json['beacons'] as List;
+      beacons = beaconsJson.map((e) => MapBeaconModel.fromJson(e)).toList();
+    }
+
     return MapModel(
       id: json['id'],
       name: json['name'],
@@ -29,7 +48,11 @@ class MapModel {
       extraWidthRight: double.parse(json['extraWidthRight']),
       extraWidthLeft: double.parse(json['extraWidthLeft']),
       extraHeightTop: double.parse(json['extraHeightTop']),
-      extraHeightBottom: double.parse(json['extraHeightBottom']),
+      extraHeightBottom: double.parse(
+        json['extraHeightBottom'],
+      ),
+      testPoints: testPoints,
+      beacons: beacons,
     );
   }
 
@@ -41,6 +64,8 @@ class MapModel {
         'extraWidthLeft': extraWidthLeft,
         'extraHeightTop': extraHeightTop,
         'extraHeightBottom': extraHeightBottom,
+        'testPoints': testPoints.map((e) => e.toJson()).toList(),
+        'beacons': beacons.map((e) => e.toJson()).toList(),
       };
 
   double baseWidth = 1000;

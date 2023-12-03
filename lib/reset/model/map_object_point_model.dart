@@ -13,7 +13,7 @@ class MapObjectPointModel {
       );
 
   Map<String, dynamic> toJson() => {
-        'x': point.dx,
-        'y': point.dy,
+        'x': point.dx.toString(),
+        'y': point.dy.toString(),
       };
 }
