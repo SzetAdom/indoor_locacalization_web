@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:indoor_localization_web/reset/map_object_model.dart';
+import 'package:indoor_localization_web/reset/map_objects/map_object_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'map_model.g.dart';
-
-@JsonSerializable()
 class MapModel {
   String id;
   String name;
@@ -15,16 +12,36 @@ class MapModel {
     required this.id,
     required this.name,
     required this.objects,
-    this.extraWidthRigth = 100,
+    this.extraWidthRight = 100,
     this.extraWidthLeft = 100,
     this.extraHeightTop = 100,
     this.extraHeightBottom = 100,
   });
 
-  factory MapModel.fromJson(Map<String, dynamic> json) =>
-      _$MapModelFromJson(json);
+  factory MapModel.fromJson(Map<String, dynamic> json) {
+    var objects = json['objects'] as List;
+    List<MapObjectModel> objectsList =
+        objects.map((e) => MapObjectModel.fromJson(e)).toList();
+    return MapModel(
+      id: json['id'],
+      name: json['name'],
+      objects: objectsList,
+      extraWidthRight: double.parse(json['extraWidthRight']),
+      extraWidthLeft: double.parse(json['extraWidthLeft']),
+      extraHeightTop: double.parse(json['extraHeightTop']),
+      extraHeightBottom: double.parse(json['extraHeightBottom']),
+    );
+  }
 
-  Map<String, dynamic> toJson() => _$MapModelToJson(this);
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'objects': objects.map((e) => e.toJson()).toList(),
+        'extraWidthRight': extraWidthRight,
+        'extraWidthLeft': extraWidthLeft,
+        'extraHeightTop': extraHeightTop,
+        'extraHeightBottom': extraHeightBottom,
+      };
 
   double baseWidth = 1000;
   double baseHeight = 1000;
@@ -33,7 +50,7 @@ class MapModel {
 
   void addExtraWidthRigth(double value) {
     if (value < 0 && widthRight < 30) return;
-    extraWidthRigth += value;
+    extraWidthRight += value;
   }
 
   void addExtraWidthLeft(double value) {
@@ -53,7 +70,7 @@ class MapModel {
 
   void removeExtraWidthRigth(double value) {
     if (value > 0 && widthRight < 30) return;
-    extraWidthRigth -= value;
+    extraWidthRight -= value;
   }
 
   void removeExtraWidthLeft(double value) {
@@ -71,14 +88,14 @@ class MapModel {
     extraHeightBottom -= value;
   }
 
-  double extraWidthRigth;
+  double extraWidthRight;
   double extraWidthLeft;
   double extraHeightTop;
   double extraHeightBottom;
 
-  double get width => baseWidth + extraWidthRigth + extraWidthLeft;
+  double get width => baseWidth + extraWidthRight + extraWidthLeft;
   double get height => baseHeight + extraHeightTop + extraHeightBottom;
-  double get widthRight => baseWidth / 2 + extraWidthRigth;
+  double get widthRight => baseWidth / 2 + extraWidthRight;
   double get widthLeft => baseWidth / 2 + extraWidthLeft;
   double get heightTop => baseHeight / 2 + extraHeightTop;
   double get heightBottom => baseHeight / 2 + extraHeightBottom;

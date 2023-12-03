@@ -64,7 +64,7 @@ class MapObjectModel implements MapObjectInterface {
               .map((e) =>
                   MapObjectPointModel.fromJson(e as Map<String, dynamic>))
               .toList(),
-        );
+        );                                                                                                                                                                                                                                                                                                                                                                                                                             
     }
   }
 
@@ -74,7 +74,7 @@ class MapObjectModel implements MapObjectInterface {
       'name': name,
       'icon': icon,
       'description': description,
-      'type': type.toString().split('.').last,
+      'type': type,
       'pointsRaw': pointsRaw,
     };
     return res;

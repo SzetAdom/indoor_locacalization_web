@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/map_editor_controller.dart';
-import 'package:indoor_localization_web/reset/map_object_model.dart';
+import 'package:indoor_localization_web/reset/map_objects/map_object_model.dart';
 import 'package:indoor_localization_web/reset/model/map_object_point_model.dart';
 import 'package:indoor_localization_web/reset/widget/custom_text_input.dart';
 import 'package:provider/provider.dart';

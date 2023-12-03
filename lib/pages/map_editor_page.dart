@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:indoor_localization_web/reset/map_editor_controller.dart';
-import 'package:indoor_localization_web/reset/map_editor_painer.dart';
+import 'package:indoor_localization_web/reset/map_editor_painter.dart';
 import 'package:indoor_localization_web/reset/widget/control_panel_widget.dart';
 import 'package:provider/provider.dart';
 

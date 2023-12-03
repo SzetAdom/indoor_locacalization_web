@@ -4,12 +4,12 @@ import 'dart:html';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:indoor_localization_web/reset/map_model.dart';
-import 'package:indoor_localization_web/reset/map_object_model.dart';
+import 'package:indoor_localization_web/reset/model/map_model.dart';
+import 'package:indoor_localization_web/reset/map_objects/map_object_model.dart';
 import 'package:indoor_localization_web/reset/map_objects/wall_object.dart';
-import 'package:indoor_localization_web/reset/model/door_model.dart';
+import 'package:indoor_localization_web/reset/map_objects/door_model.dart';
 import 'package:indoor_localization_web/reset/model/map_object_point_model.dart';
-import 'package:indoor_localization_web/reset/model/wall_object_point_model.dart';
+import 'package:indoor_localization_web/reset/map_objects/wall_object_point_model.dart';
 
 enum EditMode {
   select,

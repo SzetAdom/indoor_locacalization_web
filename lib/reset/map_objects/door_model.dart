@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:indoor_localization_web/reset/map_helper.dart';
+
+import '../map_helper.dart';
 
 class DoorModel {
   int firstPointIndex;

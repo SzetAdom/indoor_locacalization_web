@@ -2,14 +2,11 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:indoor_localization_web/reset/map_helper.dart';
-import 'package:indoor_localization_web/reset/map_object_model.dart';
-import 'package:indoor_localization_web/reset/model/door_model.dart';
-import 'package:indoor_localization_web/reset/model/wall_object_point_model.dart';
+import 'package:indoor_localization_web/reset/map_objects/map_object_model.dart';
+import 'package:indoor_localization_web/reset/map_objects/door_model.dart';
+import 'package:indoor_localization_web/reset/map_objects/wall_object_point_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'wall_object.g.dart';
-
-@JsonSerializable()
 class WallObject extends MapObjectModel {
   WallObject({
     required String id,
@@ -28,11 +25,30 @@ class WallObject extends MapObjectModel {
 
   List<DoorModel> doors = [];
 
-  factory WallObject.fromJson(Map<String, dynamic> json) =>
-      _$WallObjectFromJson(json);
+  factory WallObject.fromJson(Map<String, dynamic> json) {
+    return WallObject(
+      id: json['id'],
+      name: json['name'],
+      icon: json['icon'],
+      description: json['description'],
+      pointsRaw: (json['pointsRaw'] as List<dynamic>)
+          .map((e) => WallObjectPointModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      doors: (json['doors'] as List<dynamic>)
+          .map((e) => DoorModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
 
   @override
-  Map<String, dynamic> toJson() => _$WallObjectToJson(this);
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'icon': icon,
+        'description': description,
+        'pointsRaw': pointsRaw.map((e) => e.toJson()).toList(),
+        'doors': doors.map((e) => e.toJson()).toList(),
+      };
 
   @override
   void draw(Canvas canvas, Size size, {bool selected = false}) {
