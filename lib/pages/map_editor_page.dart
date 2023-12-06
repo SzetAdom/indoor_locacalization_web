@@ -1,224 +1,197 @@
-import 'dart:developer';
-import 'dart:html';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:indoor_localization_web/controller/map_object_editor_controller.dart';
-import 'package:indoor_localization_web/widget/map_editor/map_editor_control_panel.dart';
-import 'package:indoor_localization_web/widgets/object_list_widget.dart';
-import 'package:matrix_gesture_detector/matrix_gesture_detector.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:indoor_localization_web/reset/map_editor_controller.dart';
+import 'package:indoor_localization_web/reset/map_editor_painter.dart';
+import 'package:indoor_localization_web/reset/widget/control_panel_widget.dart';
 import 'package:provider/provider.dart';
 
 class MapEditorPage extends StatefulWidget {
-  const MapEditorPage({Key? key}) : super(key: key);
+  const MapEditorPage({
+    Key? key,
+    required this.mapId,
+  }) : super(key: key);
+
+  final String mapId;
+
   @override
-  State<MapEditorPage> createState() => _MapEditorPageState();
+  State<MapEditorPage> createState() => _MapEditorPageResetState();
 }
 
-class _MapEditorPageState extends State<MapEditorPage> {
-  Matrix4 matrix = Matrix4.identity();
-  ValueNotifier<int> notifier = ValueNotifier(0);
-  late MapObjectEditorController controller;
-  Future? future;
+class _MapEditorPageResetState extends State<MapEditorPage> {
+  late MapEditorController controller;
 
-  String? mapId;
+  late Future<bool> future;
 
   @override
   void initState() {
-    // TODO: implement initState
-    log('initState');
-    controller = MapObjectEditorController();
-    controller.addListener(() {
-      setState(() {});
-    });
-
     super.initState();
+    controller = MapEditorController();
+    future = controller.loadMap();
+    ServicesBinding.instance.keyboard.addHandler(_onKey);
   }
 
-  void loadMapId(BuildContext context) {
-    try {
-      mapId ??= (ModalRoute.of(context)?.settings.arguments ?? '') as String;
-      if (mapId != '') {
-        Storage localStorage = window.localStorage;
-        localStorage['mapId'] = mapId!;
-      } else {
-        Storage localStorage = window.localStorage;
-        mapId = localStorage['mapId'];
+  bool _onKey(KeyEvent event) {
+    final key = event.logicalKey.keyLabel;
+
+    if (event is KeyDownEvent) {
+      if (key == 'Shift Left') {
+        controller.selectMap(true);
+      } else if (key == 'Control Left') {
+        controller.setSnapToGrid(true);
       }
-    } catch (e) {
-      log(e.toString());
-      Navigator.pop(context);
+    } else if (event is KeyUpEvent) {
+      if (key == 'Shift Left') {
+        controller.selectMap(false);
+      } else if (key == 'Control Left') {
+        controller.setSnapToGrid(false);
+      }
+    }
+    return false;
+  }
+
+  void onPointerScroll(PointerScrollEvent event) {
+    if (event.scrollDelta.dy < 0) {
+      controller.zoomIn(event.localPosition);
+    } else {
+      controller.zoomOut(event.localPosition);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    loadMapId(context);
-    future ??= controller.init(mapId!);
-    // var _mapObjectController = Provider.of<MapObjectProvider>(context);
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: () {
-              controller.save();
-            },
-            icon: const Icon(Icons.save),
+    return ChangeNotifierProvider<MapEditorController>(
+      create: (context) => controller,
+      child: Consumer<MapEditorController>(builder: (context, value, child) {
+        return Scaffold(
+          appBar: AppBar(
+            elevation: 10,
+            actions: [
+              IconButton(
+                  onPressed: () async {
+                    String data = await controller.openFile();
+                    controller.setMap(data);
+                  },
+                  icon: const Icon(
+                    FontAwesomeIcons.fileImport,
+                  )),
+              IconButton(
+                onPressed: () {
+                  controller.export();
+                },
+                icon: const Icon(Icons.save),
+              ),
+            ],
           ),
-          IconButton(
-            onPressed: () {
-              // controller.undo();
-            },
-            icon: const Icon(Icons.undo),
-          ),
-          IconButton(
-            onPressed: () {
-              // controller.redo();
-            },
-            icon: const Icon(Icons.redo),
-          ),
-        ],
-      ),
-      body: ChangeNotifierProvider<MapObjectEditorController>(
-        create: (context) => controller,
-        child: Consumer<MapObjectEditorController>(
-          builder: (context, value, child) => FutureBuilder(
+          body: FutureBuilder(
               future: future,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (!snapshot.hasData ||
                       (snapshot.hasData && snapshot.data == false)) {
-                    return Container(
-                      child: const Text('Hiba történt betöltés közben'),
-                    );
+                    return const Text('Hiba történt betöltés közben');
                   }
 
-                  return Row(
-                    children: [
-                      const MapEditorControlPanel(),
-                      Expanded(
-                        child: Listener(
-                          onPointerSignal: (event) {
-                            if (event is PointerScrollEvent &&
-                                RawKeyboard.instance.keysPressed
-                                    .contains(LogicalKeyboardKey.controlLeft)) {
-                              if (event.scrollDelta.dy < 0) {
-                                matrix = matrix.scaled(1.1);
-                                controller.changeScale(controller.scale * 1.1);
-                              } else {
-                                matrix = matrix.scaled(1 / 1.1);
-                                controller.changeScale(controller.scale / 1.1);
-                              }
-
-                              notifier.value++;
-                            }
-                          },
-                          child: Container(
-                            child: Stack(
+                  return Listener(
+                    onPointerSignal: (event) {
+                      if (event is PointerScrollEvent) {
+                        onPointerScroll(event);
+                      }
+                    },
+                    child: Container(
+                      color: Colors.blueGrey,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                LayoutBuilder(
-                                  builder: (ctx, constraints) {
-                                    return MatrixGestureDetector(
-                                      shouldRotate: false,
-                                      shouldScale: false,
-                                      shouldTranslate: value.mapSelected,
-                                      onMatrixUpdate: (m, tm, sm, rm) {
-                                        matrix = MatrixGestureDetector.compose(
-                                            matrix, tm, sm, null);
-
-                                        notifier.value++;
-                                      },
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          controller.selectObject(-1, true);
-                                        },
-                                        child: Container(
-                                          width: double.infinity,
-                                          height: double.infinity,
-                                          alignment: Alignment.topLeft,
-                                          color: const Color(0xff444444),
-                                          child: AnimatedBuilder(
-                                            animation: notifier,
-                                            builder: (ctx, child) {
-                                              return Transform(
-                                                transform: matrix,
-                                                child: OverflowBox(
-                                                  minHeight: 0,
-                                                  minWidth: 0,
-                                                  maxHeight: double.infinity,
-                                                  maxWidth: double.infinity,
-                                                  child: Container(
-                                                    width: controller
-                                                        .mapDataModel.width,
-                                                    height: controller
-                                                        .mapDataModel.height,
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                      color: Colors.white,
-                                                    ),
-                                                    child: Container(
-                                                      color:
-                                                          Colors.grey.shade200,
-                                                      child: GridPaper(
-                                                        color: Colors.black,
-                                                        child: Stack(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          children: [
-                                                            for (int i = 0;
-                                                                i <
-                                                                    controller
-                                                                        .mapDataModel
-                                                                        .objects
-                                                                        .length;
-                                                                i++)
-                                                              controller
-                                                                  .getEditWidget(
-                                                                      i)
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
+                                const ControlPanelWidget(),
+                                Expanded(
+                                  child: Container(
+                                    height: MediaQuery.of(context).size.height,
+                                    color: Colors.grey,
+                                    child: GestureDetector(
+                                      onTapDown: (details) => controller
+                                          .onTap(details.localPosition),
+                                      onPanStart: (details) => controller
+                                          .onPanStart(details.localPosition),
+                                      onPanUpdate: (details) =>
+                                          controller.onPanUpdate(details),
+                                      onPanEnd: (details) =>
+                                          controller.onPanEnd(),
+                                      child: ClipRect(
+                                        clipBehavior: Clip.hardEdge,
+                                        child: ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            maxWidth: controller.map.width,
+                                            maxHeight: controller.map.height,
+                                          ),
+                                          child: ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                              minWidth: controller.map.width,
+                                              minHeight: controller.map.height,
+                                            ),
+                                            child: LayoutBuilder(
+                                                builder: (context, constrains) {
+                                              controller.canvasSize =
+                                                  constrains.biggest;
+                                              return CustomPaint(
+                                                painter: MapEditorPainter(
+                                                  map: controller.map,
+                                                  selectedPointId: controller
+                                                      .selectedObjectId,
+                                                  canvasOffset:
+                                                      controller.canvasOffset,
+                                                  gridStep: controller.gridStep,
+                                                  mapSelected:
+                                                      controller.mapSelected,
+                                                  mapEditorPoints: controller
+                                                      .mapEditorPoints,
+                                                  selectedMapEditorPoint:
+                                                      controller
+                                                          .selectedMapEditorPoint,
+                                                  zoomLevel:
+                                                      controller.zoomLevel,
+                                                  mapEditPointSize: controller
+                                                      .mapEditPointSize,
+                                                  pointSize:
+                                                      controller.pointSize,
                                                 ),
                                               );
-                                            },
+                                            }),
                                           ),
                                         ),
                                       ),
-                                    );
-                                  },
+                                    ),
+                                  ),
                                 ),
+                                // Container(
+                                //   width: 300,
+                                //   color: Colors.blueGrey,
+                                //   child: Column(children: [
+                                //     const SizedBox(
+                                //         height: 400, child: ObjectListWidget()),
+                                //     GestureDetector(
+                                //       child: Container(
+                                //           child: const Text(
+                                //         'Add object',
+                                //         style: TextStyle(color: Colors.white),
+                                //       )),
+                                //     ),
+                                //     IconButton(
+                                //         color: Colors.white,
+                                //         onPressed: () {},
+                                //         icon: const Icon(Icons.add)),
+                                //   ]),
+                                // )
                               ],
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                      Container(
-                        width: 300.w,
-                        color: Colors.blueGrey,
-                        child: Column(children: [
-                          const SizedBox(
-                              height: 400, child: ObjectListWidget()),
-                          GestureDetector(
-                            child: Container(
-                                child: const Text(
-                              'Add object',
-                              style: TextStyle(color: Colors.white),
-                            )),
-                          ),
-                          IconButton(
-                              color: Colors.white,
-                              onPressed: Provider.of<MapObjectEditorController>(
-                                      context,
-                                      listen: false)
-                                  .addObject,
-                              icon: const Icon(Icons.add)),
-                        ]),
-                      )
-                    ],
+                    ),
                   );
                 } else {
                   return const Center(
@@ -226,8 +199,8 @@ class _MapEditorPageState extends State<MapEditorPage> {
                   );
                 }
               }),
-        ),
-      ),
+        );
+      }),
     );
   }
 }
