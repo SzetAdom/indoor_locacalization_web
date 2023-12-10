@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:indoor_localization_web/reset/map_editor_controller.dart';
 import 'package:indoor_localization_web/reset/map_editor_painter.dart';
+import 'package:indoor_localization_web/reset/widget/add_beacon_pop_up.dart';
+import 'package:indoor_localization_web/reset/widget/add_test_point.dart';
 import 'package:indoor_localization_web/reset/widget/control_panel_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -52,6 +54,10 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
   }
 
   void onPointerScroll(PointerScrollEvent event) {
+    if (event.localPosition.dx < MediaQuery.of(context).size.width * 0.25) {
+      return;
+    }
+
     if (event.scrollDelta.dy < 0) {
       controller.zoomIn(event.localPosition);
     } else {
@@ -68,6 +74,45 @@ class _MapEditorPageResetState extends State<MapEditorPage> {
           appBar: AppBar(
             elevation: 10,
             actions: [
+              //add beacon
+              IconButton(
+                  onPressed: () async {
+                    //show popup asking for
+                    var beacon = await showDialog(
+                        context: context,
+                        builder: (context) => const Material(
+                            child: Center(child: AddBeaconPopUp())));
+                    if (beacon != null) {
+                      controller.addBeacon(beacon);
+                    }
+                  },
+                  icon: const Row(
+                    children: [
+                      Icon(
+                        Icons.add,
+                      ),
+                      Text('Beacon'),
+                    ],
+                  )),
+              //add test point
+              IconButton(
+                  onPressed: () async {
+                    var testPoint = await showDialog(
+                        context: context,
+                        builder: (context) => const Material(
+                            child: Center(child: AddTestPointPopUp())));
+                    if (testPoint != null) {
+                      controller.addTestPoint(testPoint);
+                    }
+                  },
+                  icon: const Row(
+                    children: [
+                      Icon(
+                        Icons.add,
+                      ),
+                      Text('Tesztpont'),
+                    ],
+                  )),
               IconButton(
                   onPressed: () async {
                     String data = await controller.openFile();

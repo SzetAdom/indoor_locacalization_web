@@ -7,7 +7,7 @@ class MapModel {
   String id;
   String name;
 
-  List<WallObject> objects;
+  List<WallObjectModel> objects;
   List<TestPointModel> testPoints;
   List<MapBeaconModel> beacons;
 
@@ -25,8 +25,8 @@ class MapModel {
 
   factory MapModel.fromJson(Map<String, dynamic> json) {
     var objects = json['objects'] as List;
-    List<WallObject> objectsList =
-        objects.map((e) => WallObject.fromJson(e)).toList();
+    List<WallObjectModel> objectsList =
+        objects.map((e) => WallObjectModel.fromJson(e)).toList();
 
     List<TestPointModel> testPoints = [];
     if (json['testPoints'] != null) {
@@ -45,11 +45,11 @@ class MapModel {
       id: json['id'],
       name: json['name'],
       objects: objectsList,
-      extraWidthRight: double.parse(json['extraWidthRight']),
-      extraWidthLeft: double.parse(json['extraWidthLeft']),
-      extraHeightTop: double.parse(json['extraHeightTop']),
+      extraWidthRight: double.parse(json['extraWidthRight'].toString()),
+      extraWidthLeft: double.parse(json['extraWidthLeft'].toString()),
+      extraHeightTop: double.parse(json['extraHeightTop'].toString()),
       extraHeightBottom: double.parse(
-        json['extraHeightBottom'],
+        json['extraHeightBottom'].toString(),
       ),
       testPoints: testPoints,
       beacons: beacons,

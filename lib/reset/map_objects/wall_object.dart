@@ -6,8 +6,8 @@ import 'package:indoor_localization_web/reset/map_objects/door_model.dart';
 import 'package:indoor_localization_web/reset/map_objects/map_object_model.dart';
 import 'package:indoor_localization_web/reset/map_objects/wall_object_point_model.dart';
 
-class WallObject extends MapObjectModel {
-  WallObject({
+class WallObjectModel extends MapObjectModel {
+  WallObjectModel({
     required String id,
     String? name,
     required String description,
@@ -24,8 +24,8 @@ class WallObject extends MapObjectModel {
 
   List<DoorModel> doors = [];
 
-  factory WallObject.fromJson(Map<String, dynamic> json) {
-    return WallObject(
+  factory WallObjectModel.fromJson(Map<String, dynamic> json) {
+    return WallObjectModel(
       id: json['id'],
       name: json['name'],
       icon: json['icon'],
@@ -48,6 +48,18 @@ class WallObject extends MapObjectModel {
         'pointsRaw': pointsRaw.map((e) => e.toJson()).toList(),
         'doors': doors.map((e) => e.toJson()).toList(),
       };
+
+  //copy
+  factory WallObjectModel.copy(WallObjectModel object) {
+    return WallObjectModel(
+      id: object.id,
+      name: object.name,
+      icon: object.icon,
+      description: object.description ?? '',
+      pointsRaw: object.pointsRaw as List<WallObjectPointModel>?,
+      doors: object.doors,
+    );
+  }
 
   @override
   void draw(Canvas canvas, Size size, {bool selected = false}) {

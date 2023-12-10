@@ -53,7 +53,7 @@ class MapObjectModel implements MapObjectInterface {
     var type = json['type'];
     switch (type) {
       case 'wall':
-        return WallObject.fromJson(json);
+        return WallObjectModel.fromJson(json);
       default:
         return MapObjectModel(
           id: json['id'],
@@ -78,6 +78,18 @@ class MapObjectModel implements MapObjectInterface {
       'pointsRaw': pointsRaw,
     };
     return res;
+  }
+
+  //copywith
+
+  factory MapObjectModel.copy(MapObjectModel object) {
+    return MapObjectModel(
+      id: object.id,
+      name: object.name,
+      icon: object.icon,
+      description: object.description,
+      pointsRaw: object.pointsRaw,
+    );
   }
 
   @override

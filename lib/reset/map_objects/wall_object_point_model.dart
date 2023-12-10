@@ -11,7 +11,7 @@ class WallObjectPointModel extends MapObjectPointModel {
 
   factory WallObjectPointModel.fromJson(Map<String, dynamic> json) =>
       WallObjectPointModel(
-        point: Offset(json['x'], json['y']),
+        point: Offset(double.parse(json['x']), double.parse(json['y'])),
       );
 
   @override
