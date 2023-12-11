@@ -40,18 +40,20 @@ class _ControlPanelWidgetState extends State<ControlPanelWidget> {
             child: Column(
               children: [
                 const SizedBox(
-                  child: Text('Edit object:'),
+                  child: Text('Térkép elem szerkesztése:'),
                 ),
                 const SizedBox(
                   height: 10,
                 ),
-                MapItemEditorWidget(controller.selectedObject ??
-                    WallObject(
-                        id: '',
-                        description: '',
-                        name: '',
-                        pointsRaw: [],
-                        doors: []))
+                Expanded(
+                  child: MapItemEditorWidget(controller.selectedObject ??
+                      WallObjectModel(
+                          id: '',
+                          description: '',
+                          name: '',
+                          pointsRaw: [],
+                          doors: [])),
+                )
               ],
             ),
           )),
@@ -78,19 +80,28 @@ class _ControlPanelWidgetState extends State<ControlPanelWidget> {
                     child: Column(
                       children: [
                         const SizedBox(
-                          child: Text('Map objects:'),
+                          child: Text('Térkép elemek:'),
                         ),
                         const SizedBox(
                           height: 10,
                         ),
-                        ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: controller.map.objects.length,
-                            itemBuilder: (context, index) {
-                              MapObjectModel object =
-                                  controller.map.objects[index];
-                              return MapItemListTile(object);
-                            }),
+                        Expanded(
+                          child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: controller.map.objects.length,
+                              itemBuilder: (context, index) {
+                                MapObjectModel object =
+                                    controller.map.objects[index];
+                                return MapItemListTile(object);
+                              }),
+                        ),
+                        //add new object button
+                        ElevatedButton(
+                          onPressed: () {
+                            controller.addNewObject();
+                          },
+                          child: const Text('Új elem hozzáadása'),
+                        ),
                       ],
                     ),
                   ),
@@ -112,26 +123,39 @@ class MapItemListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-        onTap: () {
-          context.read<MapEditorController>().selectObject(object.id);
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            color: context.watch<MapEditorController>().selectedObjectId ==
-                    object.id
-                ? Colors.blue.withOpacity(0.2)
-                : Colors.transparent,
-          ),
-          child: Text(object.name ?? object.id),
-        ));
+    return Row(
+      children: [
+        Expanded(
+          child: GestureDetector(
+              onTap: () {
+                context.read<MapEditorController>().selectObject(object.id);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color:
+                      context.watch<MapEditorController>().selectedObjectId ==
+                              object.id
+                          ? Colors.blue.withOpacity(0.2)
+                          : Colors.transparent,
+                ),
+                child: Text(object.name ?? object.id),
+              )),
+        ),
+        IconButton(
+          icon: const Icon(Icons.delete),
+          onPressed: () {
+            context.read<MapEditorController>().removeObject(object.id);
+          },
+        ),
+      ],
+    );
   }
 }
 
 class MapItemEditorWidget extends StatefulWidget {
   const MapItemEditorWidget(this.object, {Key? key}) : super(key: key);
 
-  final WallObject object;
+  final WallObjectModel object;
 
   @override
   State<MapItemEditorWidget> createState() => _MapItemEditorWidgetState();
@@ -142,66 +166,36 @@ class _MapItemEditorWidgetState extends State<MapItemEditorWidget> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           CustomTextInput(
+            initText: widget.object.id,
+            hintText: 'Id',
+            multiline: true,
+            onTextChanged: (value) {
+              widget.object.id = value;
+            },
+            onTextSubmitted: (value) {
+              context.read<MapEditorController>().updateObject(widget.object);
+            },
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          CustomTextInput(
             initText: widget.object.name,
-            hintText: 'Name',
+            hintText: 'Név',
             onTextChanged: (value) {
               widget.object.name = value;
             },
-            onTextSubmitted: () {
+            onTextSubmitted: (value) {
               context.read<MapEditorController>().updateObject(widget.object);
             },
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          CustomTextInput(
-            initText: widget.object.description,
-            hintText: 'Description',
-            multiline: true,
-            onTextChanged: (value) {
-              widget.object.description = value;
-            },
-            onTextSubmitted: () {
-              context.read<MapEditorController>().updateObject(widget.object);
-            },
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          // CustomTextInput(
-          //   initText: widget.object.color?.value.toRadixString(16),
-          //   hintText: 'Color',
-          //   onTextChanged: (value) {
-          //     widget.object.color = Color(int.parse(value, radix: 16));
-          //   },
-          //   onTextSubmitted: () {
-          //     context.read<MapEditorController>().updateObject(widget.object);
-          //   },
-          // ),
-          //points list
-          // ListView.builder(
-          //     shrinkWrap: true,
-          //     itemCount: widget.object.points.length,
-          //     itemBuilder: (context, index) {
-          //       MapObjectPointModel point = widget.object.points[index];
-          //       return PointEditorListItem(
-          //         point: point,
-          //         onPointChanged: (point) {
-          //           context
-          //               .read<MapEditorController>()
-          //               .updateObject(widget.object);
-          //         },
-          //         onPointRemoved: (point) {
-          //           widget.object.points.remove(point);
-          //           context
-          //               .read<MapEditorController>()
-          //               .updateObject(widget.object);
-          //         },
-          //       );
-          //     }),
 
+          const SizedBox(
+            height: 10,
+          ),
           //rotating with slider and text input
           Row(
             children: [
@@ -225,7 +219,7 @@ class _MapItemEditorWidgetState extends State<MapItemEditorWidget> {
                     // angle in degrees
                     widget.object.angle = double.parse(value);
                   },
-                  onTextSubmitted: () {
+                  onTextSubmitted: (value) {
                     context
                         .read<MapEditorController>()
                         .updateObject(widget.object);
@@ -234,6 +228,41 @@ class _MapItemEditorWidgetState extends State<MapItemEditorWidget> {
               ),
             ],
           ),
+          const SizedBox(
+            height: 10,
+          ),
+          // points list
+          // ListView.builder(
+          //     shrinkWrap: true,
+          //     itemCount: widget.object.points.length,
+          //     itemBuilder: (context, index) {
+          //       MapObjectPointModel point = widget.object.points[index];
+          //       return PointEditorListItem(
+          //         point: point,
+          //         onPointChanged: (point) {
+          //           context
+          //               .read<MapEditorController>()
+          //               .updateObject(widget.object);
+          //         },
+          //         onPointRemoved: (point) {
+          //           var object = WallObjectModel.copy(widget.object);
+          //           object.removePoint(point);
+          //           context.read<MapEditorController>().updateObject(object);
+          //         },
+          //       );
+          //     }),
+          //add new point button
+
+          ElevatedButton(
+            onPressed: () {
+              widget.object.addPoint(MapObjectPointModel(
+                  point:
+                      widget.object.points.last.point + const Offset(10, 10)));
+              context.read<MapEditorController>().updateObject(widget.object);
+            },
+            child: const Text('Új pont hozzáadása'),
+          ),
+
           const SizedBox(
             height: 10,
           ),
@@ -260,6 +289,16 @@ class PointEditorListItem extends StatefulWidget {
 }
 
 class _PointEditorListItemState extends State<PointEditorListItem> {
+  late double x;
+  late double y;
+
+  @override
+  void initState() {
+    super.initState();
+    x = widget.point.point.dx;
+    y = widget.point.point.dy;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -271,9 +310,14 @@ class _PointEditorListItemState extends State<PointEditorListItem> {
           //x input
           Expanded(
             child: CustomTextInput(
-              initText: widget.point.point.dx.toString(),
+              initText: x.toString(),
               hintText: 'x',
               onTextChanged: (value) {
+                widget.point.point =
+                    Offset(double.parse(value), widget.point.point.dy);
+                widget.onPointChanged(widget.point);
+              },
+              onTextSubmitted: (value) {
                 widget.point.point =
                     Offset(double.parse(value), widget.point.point.dy);
                 widget.onPointChanged(widget.point);
@@ -283,7 +327,7 @@ class _PointEditorListItemState extends State<PointEditorListItem> {
           //y input
           Expanded(
             child: CustomTextInput(
-              initText: widget.point.point.dy.toString(),
+              initText: y.toString(),
               hintText: 'y',
               onTextChanged: (value) {
                 widget.point.point =

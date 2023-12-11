@@ -12,7 +12,7 @@ class CustomTextInput extends StatefulWidget {
 
   final String? initText;
   final Function(String)? onTextChanged;
-  final Function()? onTextSubmitted;
+  final Function(String)? onTextSubmitted;
   final String? hintText;
   final bool? multiline;
 
@@ -44,7 +44,7 @@ class _CustomTextInputState extends State<CustomTextInput> {
           controller: TextEditingController(text: widget.initText),
           onChanged: widget.onTextChanged,
           onSubmitted: (value) {
-            widget.onTextSubmitted?.call();
+            widget.onTextSubmitted?.call(value);
           },
           decoration: InputDecoration(
             hintText: widget.hintText,
