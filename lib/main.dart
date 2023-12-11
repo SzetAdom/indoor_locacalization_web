@@ -18,7 +18,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   void initState() {
     super.initState();
@@ -57,7 +56,7 @@ class _MyHomePageResetState extends State<MyHomePageReset> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('Főoldal'),
       ),
       body: Container(
         alignment: Alignment.center,
@@ -76,7 +75,7 @@ class _MyHomePageResetState extends State<MyHomePageReset> {
                   //     builder: (context) => const CrateMapPopUpWidget());
                 }),
                 child: const Text(
-                  'Create new map',
+                  'Új térkép létrehozása',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
@@ -88,4 +87,3 @@ class _MyHomePageResetState extends State<MyHomePageReset> {
     );
   }
 }
-
